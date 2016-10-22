@@ -30,7 +30,7 @@ public class User extends DataEntity<User> {
 
 	private static final long serialVersionUID = 1L;
 	private Office company;	// 归属公司
-	private Office office;	// 归属部门
+	//private Office office;	// 归属部门
 	private String loginName;// 登录名
 	private String password;// 密码
 	private String no;		// 工号
@@ -106,16 +106,16 @@ public class User extends DataEntity<User> {
 		this.company = company;
 	}
 	
-	@JsonIgnore
-	@NotNull(message="归属部门不能为空")
-	@ExcelField(title="归属部门", align=2, sort=25)
-	public Office getOffice() {
-		return office;
-	}
+	//@JsonIgnore
+	//@NotNull(message="归属部门不能为空")
+	//@ExcelField(title="归属部门", align=2, sort=25)
+	//public Office getOffice() {
+	//	return office;
+	//}
 
-	public void setOffice(Office office) {
-		this.office = office;
-	}
+	//public void setOffice(Office office) {
+	//	this.office = office;
+	//}
 
 	@Length(min=1, max=100, message="登录名长度必须介于 1 和 100 之间")
 	@ExcelField(title="登录名", align=2, sort=30)

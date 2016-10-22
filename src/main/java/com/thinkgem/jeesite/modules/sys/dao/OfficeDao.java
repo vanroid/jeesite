@@ -7,12 +7,16 @@ import com.thinkgem.jeesite.common.persistence.TreeDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
 
+import java.util.List;
+
 /**
  * 机构DAO接口
+ *
  * @author ThinkGem
  * @version 2014-05-16
  */
 @MyBatisDao
 public interface OfficeDao extends TreeDao<Office> {
-	
+    public List<Office> findByParentId(Office office);
+
 }

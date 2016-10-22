@@ -60,22 +60,22 @@
 				<form:input path="code" htmlEscape="false" maxlength="50"/>
 			</div>
 		</div>
-		<div class="control-group">
+		<%--<div class="control-group">
 			<label class="control-label">机构类型:</label>
 			<div class="controls">
 				<form:select path="type" class="input-medium">
 					<form:options items="${fns:getDictList('sys_office_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</div>
-		</div>
-		<div class="control-group">
+		</div>--%>
+		<%--<div class="control-group">
 			<label class="control-label">机构级别:</label>
 			<div class="controls">
 				<form:select path="grade" class="input-medium">
 					<form:options items="${fns:getDictList('sys_office_grade')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</div>
-		</div>
+		</div>--%>
 		<div class="control-group">
 			<label class="control-label">是否可用:</label>
 			<div class="controls">
@@ -144,7 +144,7 @@
 			<div class="control-group">
 				<label class="control-label">快速添加下级部门:</label>
 				<div class="controls">
-					<form:checkboxes path="childDeptList" items="${fns:getDictList('sys_office_common')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					<form:checkboxes path="childDeptList" items="${fns:getDictList('sys_office_common')}" itemLabel="label" itemValue="value" htmlEscape="false" />
 				</div>
 			</div>
 		</c:if>
