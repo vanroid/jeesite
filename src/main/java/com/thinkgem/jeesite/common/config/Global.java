@@ -180,5 +180,9 @@ public class Global {
 		}
 		return projectPath;
     }
+
+    public static String getRootOfficeId(){
+    	return getConfig("dc.rootOfficeId");
+	}
 	
 }
