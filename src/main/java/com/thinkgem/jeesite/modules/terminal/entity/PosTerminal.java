@@ -1,5 +1,7 @@
 package com.thinkgem.jeesite.modules.terminal.entity;
 
+import com.thinkgem.jeesite.common.persistence.DataEntity;
+import com.thinkgem.jeesite.common.persistence.TreeEntity;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 
 /**
@@ -7,7 +9,7 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
  * POS终端实体
  */
 
-public class PosTerminal {
+public class PosTerminal extends DataEntity<PosTerminal> {
     // 所属用户
     private User user;
     // 终端号

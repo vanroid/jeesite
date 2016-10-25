@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.terminal.dao.BillDao">
+    
+
+	
+	<select id="findByTerminalIdIn" resultType="Bill">
+		SELECT 
+			<include refid="cmsArticleColumns"/>
+		from ter_bill a where
+		<where>
+			terminal_id in (${terminalIds});
+		</where>		
+	</select>
+</mapper>

@@ -3,6 +3,7 @@ package com.thinkgem.jeesite.excel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.tools.corba.se.idl.constExpr.Terminal;
+import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -61,15 +62,24 @@ public class ExcelTest {
 
             // 插入机构\部门\用户
             Set<String> userLoginNames = userMap.keySet();
+            // todo 获取根机构
+            Office rootOffice = new Office();
+            rootOffice.setId(Global.getRootOfficeId());
+
             for (String loginName : userLoginNames) {
                 // 机构
                 Office company = new Office();
                 company.setName(loginName);
                 officeService.save(company);
+                // todo 所有上传的数据都是在[大创电子总公司之下]
+                company.setParent(rootOffice);
+
                 // 部门
                 Office office = new Office();
                 office.setName(loginName);
+                office.setParent(company);
                 officeService.save(office);
+
                 // 用户
                 User user = new User();
                 user.setLoginName(loginName);
