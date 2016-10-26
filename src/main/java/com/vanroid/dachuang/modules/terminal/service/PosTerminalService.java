@@ -129,7 +129,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
                 terminalCnt++;
             }
-            logger.info("共导入终端数:" + terminalCnt);
+            logger.debug("共导入终端数:" + terminalCnt);
 
             int userCnt = 0;
 
@@ -171,7 +171,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
                 userCnt++;
             }
-            logger.info("共导入用户数：" + userCnt);
+            logger.debug("共导入用户数：" + userCnt);
 
 
         } catch (InvalidFormatException e) {
