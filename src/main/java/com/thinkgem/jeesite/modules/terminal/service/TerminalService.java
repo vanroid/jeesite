@@ -8,6 +8,7 @@ import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.thinkgem.jeesite.modules.terminal.dao.BillDao;
 import com.thinkgem.jeesite.modules.terminal.dao.TerminalDao;
 import com.thinkgem.jeesite.modules.terminal.entity.Bill;
+import com.thinkgem.jeesite.modules.terminal.entity.PosTerminal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,8 @@ import java.util.Map;
 /**
  * Created by cgz on 16-10-25.
  */
-@Service
-public class TerminalService extends CrudService<TerminalDao, Terminal> {
+//@Service
+public class TerminalService extends CrudService<TerminalDao, PosTerminal> {
 
     @Autowired
     private TerminalDao terminalDao;

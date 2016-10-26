@@ -1,12 +1,13 @@
 package com.thinkgem.jeesite.modules.terminal.entity;
 
-import com.sun.org.apache.xpath.internal.operations.String;
+
+import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
  * Created by cgz on 16-10-25.
  * 端终的消费帐单
  */
-public class Bill {
+public class Bill extends DataEntity<Bill> {
     /**
      * 清算日期
      */

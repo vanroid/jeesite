@@ -7,6 +7,6 @@ import com.thinkgem.jeesite.modules.terminal.entity.PosTerminal;
 /**
  * Created by cgz on 16-10-25.
  */
-@MyBatisDao
+//@MyBatisDao
 public interface TerminalDao extends CrudDao<PosTerminal> {
 }

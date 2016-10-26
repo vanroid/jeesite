@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by cgz on 16-10-25.
  */
-@MyBatisDao
+//@MyBatisDao
 public interface BillDao extends CrudDao<Bill> {
     List<Bill> findByTerminalIdIn(String[] ids);
 }

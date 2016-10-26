@@ -284,7 +284,12 @@ public class UserUtils {
 //		getCacheMap().remove(key);
 		getSession().removeAttribute(key);
 	}
-	
+
+	// 获取某用户的所有终端ID
+	public static List<String> getAllTermialIds(User user) {
+		return null;
+	}
+
 //	public static Map<String, Object> getCacheMap(){
 //		Principal principal = getPrincipal();
 //		if(principal!=null){

@@ -93,7 +93,7 @@ public class ExcelTest {
                     posTerminal.setUser(user);
                 }
                 // 批量插入
-                terminalService.save(terminals);
+               // terminalService.save(terminals);
             }
 
 
