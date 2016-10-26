@@ -112,7 +112,7 @@
 		<div class="control-group">
 			<label class="control-label">营业执照：</label>
 			<div class="controls">
-				<form:input path="businessLicenseUrl" htmlEscape="false" maxlength="512" class="input-xlarge "/>
+				<form:input path="businessLicense" htmlEscape="false" maxlength="512" class="input-xlarge "/>
 			</div>
 		</div>
 		<div class="control-group">
@@ -191,6 +191,12 @@
 			<label class="control-label">银行卡开户行：</label>
 			<div class="controls">
 				<form:input path="bankCardAccountBank" htmlEscape="false" maxlength="18" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">机具类型：</label>
+			<div class="controls">
+				<form:input path="machineType" htmlEscape="false" maxlength="18" class="input-xlarge "/>
 			</div>
 		</div>
 		<div class="control-group">

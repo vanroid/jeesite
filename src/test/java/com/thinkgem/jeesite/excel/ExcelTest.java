@@ -21,16 +21,16 @@ public class ExcelTest {
 
     @Test
     public void testImport() {
-        //PosTerminalService service = new PosTerminalService();
-        //service.importTerminals("");
+        PosTerminalService service = new PosTerminalService();
+        service.importTerminals("");
 
-        try{
+        /*try{
             ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/大创电子---商户详情表.xlsx", 100);
             Cell c = importExcel.getRow(1).getCell(0);
             System.out.println(c.getDateCellValue());
         }catch(Exception e){
             e.printStackTrace();
-        }
+        }*/
 
     }
 
