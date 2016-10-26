@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.TreeEntity;
@@ -16,19 +15,18 @@ import com.thinkgem.jeesite.common.persistence.TreeEntity;
  * 机构Entity
  * @author ThinkGem
  * @version 2013-05-15
- * @modify CGZ 2016-10-22
  */
 public class Office extends TreeEntity<Office> {
 
 	private static final long serialVersionUID = 1L;
-	private Office parent;	// 父级编号
+	//	private Office parent;	// 父级编号
 //	private String parentIds; // 所有父级编号
 	private Area area;		// 归属区域
 	private String code; 	// 机构编码
-//	private String name; 	// 机构名称
+	//	private String name; 	// 机构名称
 //	private Integer sort;		// 排序
-	private String type ="1"; 	// 机构类型（1：公司；2：部门；3：小组）
-	private String grade ="1"; 	// 机构等级（1：一级；2：二级；3：三级；4：四级）
+	private String type; 	// 机构类型（1：公司；2：部门；3：小组）
+	private String grade; 	// 机构等级（1：一级；2：二级；3：三级；4：四级）
 	private String address; // 联系地址
 	private String zipCode; // 邮政编码
 	private String master; 	// 负责人
@@ -39,7 +37,7 @@ public class Office extends TreeEntity<Office> {
 	private User primaryPerson;//主负责人
 	private User deputyPerson;//副负责人
 	private List<String> childDeptList;//快速添加子部门
-	
+
 	public Office(){
 		super();
 //		this.sort = 30;
@@ -49,7 +47,7 @@ public class Office extends TreeEntity<Office> {
 	public Office(String id){
 		super(id);
 	}
-	
+
 	public List<String> getChildDeptList() {
 		return childDeptList;
 	}
@@ -82,7 +80,7 @@ public class Office extends TreeEntity<Office> {
 		this.deputyPerson = deputyPerson;
 	}
 
-	@JsonBackReference
+	//	@JsonBackReference
 //	@NotNull
 	public Office getParent() {
 		return parent;
@@ -126,7 +124,7 @@ public class Office extends TreeEntity<Office> {
 //	public void setSort(Integer sort) {
 //		this.sort = sort;
 //	}
-	
+
 	@Length(min=1, max=1)
 	public String getType() {
 		return type;
@@ -211,7 +209,7 @@ public class Office extends TreeEntity<Office> {
 //	public String getParentId() {
 //		return parent != null && parent.getId() != null ? parent.getId() : "0";
 //	}
-	
+
 	@Override
 	public String toString() {
 		return name;

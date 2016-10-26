@@ -1,4 +1,4 @@
-package com.thinkgem.jeesite.modules.terminal.entity;
+package com.vanroid.dachuang.modules.terminal.entity;
 
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;

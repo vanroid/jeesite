@@ -1,22 +1,47 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao">
-    
+
 	<sql id="posTerminalColumns">
 		a.id AS "id",
-		a.terminal_num AS "terminalNum",
+		a.import_date AS "importDate",
+		a.down_date AS "downDate",
 		a.user_id AS "user.id",
+		a.install_date AS "installDate",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
+		a.trans_bank AS "transBank",
 		a.update_by AS "updateBy.id",
+		a.device_num AS "deviceNum",
 		a.update_date AS "updateDate",
+		a.device_type AS "deviceType",
 		a.remarks AS "remarks",
+		a.merchant_num AS "merchantNum",
 		a.del_flag AS "delFlag",
-		u3.name AS "user.name"
+		a.termial_num AS "termialNum",
+		a.wechat_url AS "wechatUrl",
+		a.business_license_url AS "businessLicenseUrl",
+		a.merchant_name AS "merchantName",
+		a.merchant_address AS "merchantAddress",
+		a.merchant_legal_person AS "merchantLegalPerson",
+		a.booking_person AS "bookingPerson",
+		a.telphone AS "telphone",
+		a.install_phone AS "installPhone",
+		a.device_mcc AS "deviceMcc",
+		a.debit_rate AS "debitRate",
+		a.credit_rate AS "creditRate",
+		a.foreign_rate AS "foreignRate",
+		a.id_card AS "idCard",
+		a.bank_card AS "bankCard",
+		a.bank_card_account_bank AS "bankCardAccountBank",
+		a.salesman AS "salesman",
+		a.terminal_desc AS "terminalDesc",
+		u4.name AS "user.name"
 	</sql>
 	
 	<sql id="posTerminalJoins">
-		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+		LEFT JOIN sys_user u4 ON u4.id = a.user_id
 	</sql>
     
 	<select id="get" resultType="PosTerminal">
@@ -66,34 +91,106 @@
 	<insert id="insert">
 		INSERT INTO ter_pos_terminal(
 			id,
-			terminal_num,
+			import_date,
+			down_date,
 			user_id,
+			install_date,
 			create_by,
 			create_date,
+			trans_bank,
 			update_by,
+			device_num,
 			update_date,
+			device_type,
 			remarks,
-			del_flag
+			merchant_num,
+			del_flag,
+			termial_num,
+			wechat_url,
+			business_license_url,
+			merchant_name,
+			merchant_address,
+			merchant_legal_person,
+			booking_person,
+			telphone,
+			install_phone,
+			device_mcc,
+			debit_rate,
+			credit_rate,
+			foreign_rate,
+			id_card,
+			bank_card,
+			bank_card_account_bank,
+			salesman,
+			terminal_desc
 		) VALUES (
 			#{id},
-			#{terminalNum},
+			#{importDate},
+			#{downDate},
 			#{user.id},
+			#{installDate},
 			#{createBy.id},
 			#{createDate},
+			#{transBank},
 			#{updateBy.id},
+			#{deviceNum},
 			#{updateDate},
+			#{deviceType},
 			#{remarks},
-			#{delFlag}
+			#{merchantNum},
+			#{delFlag},
+			#{termialNum},
+			#{wechatUrl},
+			#{businessLicenseUrl},
+			#{merchantName},
+			#{merchantAddress},
+			#{merchantLegalPerson},
+			#{bookingPerson},
+			#{telphone},
+			#{installPhone},
+			#{deviceMcc},
+			#{debitRate},
+			#{creditRate},
+			#{foreignRate},
+			#{idCard},
+			#{bankCard},
+			#{bankCardAccountBank},
+			#{salesman},
+			#{terminalDesc}
 		)
 	</insert>
 	
 	<update id="update">
 		UPDATE ter_pos_terminal SET 	
-			terminal_num = #{terminalNum},
+			import_date = #{importDate},
+			down_date = #{downDate},
 			user_id = #{user.id},
+			install_date = #{installDate},
+			trans_bank = #{transBank},
 			update_by = #{updateBy.id},
+			device_num = #{deviceNum},
 			update_date = #{updateDate},
-			remarks = #{remarks}
+			device_type = #{deviceType},
+			remarks = #{remarks},
+			merchant_num = #{merchantNum},
+			termial_num = #{termialNum},
+			wechat_url = #{wechatUrl},
+			business_license_url = #{businessLicenseUrl},
+			merchant_name = #{merchantName},
+			merchant_address = #{merchantAddress},
+			merchant_legal_person = #{merchantLegalPerson},
+			booking_person = #{bookingPerson},
+			telphone = #{telphone},
+			install_phone = #{installPhone},
+			device_mcc = #{deviceMcc},
+			debit_rate = #{debitRate},
+			credit_rate = #{creditRate},
+			foreign_rate = #{foreignRate},
+			id_card = #{idCard},
+			bank_card = #{bankCard},
+			bank_card_account_bank = #{bankCardAccountBank},
+			salesman = #{salesman},
+			terminal_desc = #{terminalDesc}
 		WHERE id = #{id}
 	</update>
 	

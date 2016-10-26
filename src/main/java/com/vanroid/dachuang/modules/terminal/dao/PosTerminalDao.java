@@ -8,9 +8,9 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
 
 /**
- * 终端设备DAO接口
+ * POS终端DAO接口
  * @author CGZ
- * @version 2016-10-25
+ * @version 2016-10-26
  */
 @MyBatisDao
 public interface PosTerminalDao extends CrudDao<PosTerminal> {
