@@ -105,6 +105,8 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         try {
             ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/大创电子---商户详情表.xlsx", 27);
 
+            //importExcel.getDataList(PosTerminal.class);
+
             int rows = importExcel.getLastDataRowNum();
             // 遍历每一行,收集 以登录名为key,其他数据为value的map
             for (int i = 1; i < rows; i++) {
@@ -116,8 +118,61 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                     userPosTerminals = Lists.newArrayList();
                 }
                 PosTerminal posTerminal = new PosTerminal();
-                // todo posTerminal.setTerminalId(row.getCell(7).getStringCellValue());
                 // todo other info
+                // 进件日期
+                posTerminal.setImportDate(row.getCell(0).getDateCellValue());
+                //下机日期
+                posTerminal.setDownDate(row.getCell(1).getDateCellValue());
+                // 装机日期
+                posTerminal.setInstallDate(row.getCell(2).getDateCellValue());
+                // 交件支行
+                posTerminal.setInstallDate(row.getCell(3).getDateCellValue());
+                // 机身号
+                posTerminal.setDeviceNum(row.getCell(4).getStringCellValue());
+                // 机子型号
+                posTerminal.setDeviceType(row.getCell(5).getStringCellValue());
+                // 商户号
+                posTerminal.setMerchantNum(row.getCell(6).getStringCellValue());
+                // 终端号
+                posTerminal.setDeviceNum(row.getCell(7).getStringCellValue());
+                // 微信二维码
+                posTerminal.setWechatUrl(row.getCell(8).getStringCellValue());
+                // todo 营业执照号码 这里是号码,不是URL
+                posTerminal.setBusinessLicenseUrl(row.getCell(9).getStringCellValue());
+                // 商户名称
+                posTerminal.setMerchantName(row.getCell(10).getStringCellValue());
+                // 地址
+                posTerminal.setMerchantName(row.getCell(11).getStringCellValue());
+                // 法人
+                posTerminal.setMerchantLegalPerson(row.getCell(12).getStringCellValue());
+                // 入账人
+                posTerminal.setBookingPerson(row.getCell(13).getStringCellValue());
+                // 联系电话
+                posTerminal.setTelphone();
+                // 装机电话
+                posTerminal.setInstallPhone();
+                // MCC码
+                posTerminal.setDeviceMcc();
+                // 借记卡费率
+                posTerminal.setDebitRate();
+                // 贷记卡费率
+                posTerminal.setCreditRate();
+                // 外币卡费率
+                posTerminal.setForeignRate();
+                // 机具类型
+                posTerminal.set();
+                // 身份证号码
+                posTerminal.setIdCard();
+                // 银行卡
+                posTerminal.setBankCard();
+                // 银行卡开户行
+                posTerminal.setBankCardAccountBank();
+
+                // 业务员
+                posTerminal.setSalesman();
+                // 详情
+                posTerminal.setTerminalDesc();
+
 
                 userPosTerminals.add(posTerminal);
 
@@ -154,6 +209,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 // 插入终端
                 List<PosTerminal> terminals = userMap.get(loginName);
                 for (PosTerminal posTerminal : terminals) {
+                    // 后台编号,所属用户
                     posTerminal.setUser(user);
                 }
                 // 批量插入
