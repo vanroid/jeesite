@@ -8,15 +8,18 @@ import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.service.OfficeService;
 import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
 import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
+import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,8 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal> {
+
+    public static final Logger logger = Logger.getLogger(PosTerminalService.class);
 
 
     @Autowired
@@ -98,19 +103,27 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
      * @return 增加终端数
      */
     public int importTerminals(String fileName) {
+        int terminalCnt = 0;
+
         List<User> users = Lists.newArrayList();
 
         Map<String, List<PosTerminal>> userMap = Maps.newHashMap();
 
         try {
-            ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/大创电子---商户详情表.xlsx", 27);
-
-            //importExcel.getDataList(PosTerminal.class);
+            // 第二个参数已无作用
+            ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/大创电子---商户详情表.xlsx", 0);
 
             int rows = importExcel.getLastDataRowNum();
             // 遍历每一行,收集 以登录名为key,其他数据为value的map
             for (int i = 1; i < rows; i++) {
+                System.out.println(terminalCnt);
                 Row row = importExcel.getRow(i);
+
+                // 没有终端号的视为无效记录,停止往下执行
+                if (ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
+                    return terminalCnt;
+                }
+
                 String loginName = row.getCell(24).getStringCellValue();
                 // 获取此用户下的所有终端
                 List<PosTerminal> userPosTerminals = userMap.get(loginName);
@@ -118,66 +131,18 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                     userPosTerminals = Lists.newArrayList();
                 }
                 PosTerminal posTerminal = new PosTerminal();
-                // todo other info
-                // 进件日期
-                posTerminal.setImportDate(row.getCell(0).getDateCellValue());
-                //下机日期
-                posTerminal.setDownDate(row.getCell(1).getDateCellValue());
-                // 装机日期
-                posTerminal.setInstallDate(row.getCell(2).getDateCellValue());
-                // 交件支行
-                posTerminal.setInstallDate(row.getCell(3).getDateCellValue());
-                // 机身号
-                posTerminal.setDeviceNum(row.getCell(4).getStringCellValue());
-                // 机子型号
-                posTerminal.setDeviceType(row.getCell(5).getStringCellValue());
-                // 商户号
-                posTerminal.setMerchantNum(row.getCell(6).getStringCellValue());
-                // 终端号
-                posTerminal.setDeviceNum(row.getCell(7).getStringCellValue());
-                // 微信二维码
-                posTerminal.setWechatUrl(row.getCell(8).getStringCellValue());
-                // todo 营业执照号码 这里是号码,不是URL
-                posTerminal.setBusinessLicenseUrl(row.getCell(9).getStringCellValue());
-                // 商户名称
-                posTerminal.setMerchantName(row.getCell(10).getStringCellValue());
-                // 地址
-                posTerminal.setMerchantName(row.getCell(11).getStringCellValue());
-                // 法人
-                posTerminal.setMerchantLegalPerson(row.getCell(12).getStringCellValue());
-                // 入账人
-                posTerminal.setBookingPerson(row.getCell(13).getStringCellValue());
-                // 联系电话
-                posTerminal.setTelphone();
-                // 装机电话
-                posTerminal.setInstallPhone();
-                // MCC码
-                posTerminal.setDeviceMcc();
-                // 借记卡费率
-                posTerminal.setDebitRate();
-                // 贷记卡费率
-                posTerminal.setCreditRate();
-                // 外币卡费率
-                posTerminal.setForeignRate();
-                // 机具类型
-                posTerminal.set();
-                // 身份证号码
-                posTerminal.setIdCard();
-                // 银行卡
-                posTerminal.setBankCard();
-                // 银行卡开户行
-                posTerminal.setBankCardAccountBank();
-
-                // 业务员
-                posTerminal.setSalesman();
-                // 详情
-                posTerminal.setTerminalDesc();
-
+                // 为字段赋值
+                excelRowToPosterminal(posTerminal, row);
 
                 userPosTerminals.add(posTerminal);
 
                 userMap.put(loginName, userPosTerminals);
+
+                terminalCnt++;
             }
+            logger.info("共导入终端数:" + terminalCnt);
+
+            int userCnt = 0;
 
             // 插入机构\部门\用户
             Set<String> userLoginNames = userMap.keySet();
@@ -189,7 +154,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 // 机构
                 Office company = new Office();
                 company.setName(loginName);
-                officeService.save(company);
+                //officeService.save(company);
                 // todo 所有上传的数据都是在[大创电子总公司之下]
                 company.setParent(rootOffice);
 
@@ -197,14 +162,14 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 Office office = new Office();
                 office.setName(loginName);
                 office.setParent(company);
-                officeService.save(office);
+                //officeService.save(office);
 
                 // 用户
                 User user = new User();
                 user.setLoginName(loginName);
                 user.setCompany(company);
                 user.setOffice(office);
-                systemService.saveUser(user);
+                //systemService.saveUser(user);
 
                 // 插入终端
                 List<PosTerminal> terminals = userMap.get(loginName);
@@ -222,7 +187,17 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return 0;
+        return terminalCnt;
+    }
+
+    private void excelRowToPosterminal(PosTerminal posTerminal, Row row) {
+        // 进件日期
+        posTerminal.setImportDate(ExcelUtils.getDateCellValue(row, 0));
+        //下机日期
+        posTerminal.setDownDate(ExcelUtils.getDateCellValue(row, 1));
+        // 装机日期
+        posTerminal.setInstallDate(ExcelUtils.getDateCellValue(row, 2));
+
     }
 
     /**

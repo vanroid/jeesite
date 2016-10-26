@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao">
-
+    
 	<sql id="posTerminalColumns">
 		a.id AS "id",
 		a.import_date AS "importDate",
@@ -21,7 +20,7 @@
 		a.del_flag AS "delFlag",
 		a.termial_num AS "termialNum",
 		a.wechat_url AS "wechatUrl",
-		a.business_license_url AS "businessLicenseUrl",
+		a.business_license AS "businessLicense",
 		a.merchant_name AS "merchantName",
 		a.merchant_address AS "merchantAddress",
 		a.merchant_legal_person AS "merchantLegalPerson",
@@ -33,6 +32,7 @@
 		a.credit_rate AS "creditRate",
 		a.foreign_rate AS "foreignRate",
 		a.id_card AS "idCard",
+		a.machine_type AS "machineType",
 		a.bank_card AS "bankCard",
 		a.bank_card_account_bank AS "bankCardAccountBank",
 		a.salesman AS "salesman",
@@ -107,7 +107,7 @@
 			del_flag,
 			termial_num,
 			wechat_url,
-			business_license_url,
+			business_license,
 			merchant_name,
 			merchant_address,
 			merchant_legal_person,
@@ -119,6 +119,7 @@
 			credit_rate,
 			foreign_rate,
 			id_card,
+			machine_type,
 			bank_card,
 			bank_card_account_bank,
 			salesman,
@@ -141,7 +142,7 @@
 			#{delFlag},
 			#{termialNum},
 			#{wechatUrl},
-			#{businessLicenseUrl},
+			#{businessLicense},
 			#{merchantName},
 			#{merchantAddress},
 			#{merchantLegalPerson},
@@ -153,6 +154,7 @@
 			#{creditRate},
 			#{foreignRate},
 			#{idCard},
+			#{machineType},
 			#{bankCard},
 			#{bankCardAccountBank},
 			#{salesman},
@@ -175,7 +177,7 @@
 			merchant_num = #{merchantNum},
 			termial_num = #{termialNum},
 			wechat_url = #{wechatUrl},
-			business_license_url = #{businessLicenseUrl},
+			business_license = #{businessLicense},
 			merchant_name = #{merchantName},
 			merchant_address = #{merchantAddress},
 			merchant_legal_person = #{merchantLegalPerson},
@@ -187,6 +189,7 @@
 			credit_rate = #{creditRate},
 			foreign_rate = #{foreignRate},
 			id_card = #{idCard},
+			machine_type = #{machineType},
 			bank_card = #{bankCard},
 			bank_card_account_bank = #{bankCardAccountBank},
 			salesman = #{salesman},

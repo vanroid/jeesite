@@ -5,6 +5,7 @@ package com.vanroid.dachuang.modules.terminal.entity;
 
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.thinkgem.jeesite.common.utils.excel.annotation.ExcelField;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
@@ -12,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
- * POS终端Entity
+ * 终端设备Entity
  * @author CGZ
  * @version 2016-10-26
  */
@@ -29,7 +30,7 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 	private String merchantNum;		// 商户号,重要字段
 	private String termialNum;		// 终端号,重要字段
 	private String wechatUrl;		// 微信二维码
-	private String businessLicenseUrl;		// 营业执照
+	private String businessLicense;		// 营业执照
 	private String merchantName;		// 商户名称
 	private String merchantAddress;		// 地址
 	private String merchantLegalPerson;		// 法人
@@ -41,6 +42,7 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 	private String creditRate;		// 贷记卡费率
 	private String foreignRate;		// 外币卡费率
 	private String idCard;		// 身份证号
+	private String machineType;		// 机具类型
 	private String bankCard;		// 银行卡号
 	private String bankCardAccountBank;		// 银行卡开户行
 	private String salesman;		// 业务员
@@ -55,6 +57,7 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 	}
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	//@ExcelField(title="进件日期", sort=0, fieldType=Date.class)
 	public Date getImportDate() {
 		return importDate;
 	}
@@ -62,7 +65,8 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 	public void setImportDate(Date importDate) {
 		this.importDate = importDate;
 	}
-	
+
+	//@ExcelField(title="进件日期", sort=1, fieldType=Date.class)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date getDownDate() {
 		return downDate;
@@ -71,7 +75,7 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 	public void setDownDate(Date downDate) {
 		this.downDate = downDate;
 	}
-	
+
 	@NotNull(message="所属用户不能为空")
 	public User getUser() {
 		return user;
@@ -145,12 +149,12 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 	}
 	
 	@Length(min=0, max=512, message="营业执照长度必须介于 0 和 512 之间")
-	public String getBusinessLicenseUrl() {
-		return businessLicenseUrl;
+	public String getBusinessLicense() {
+		return businessLicense;
 	}
 
-	public void setBusinessLicenseUrl(String businessLicenseUrl) {
-		this.businessLicenseUrl = businessLicenseUrl;
+	public void setBusinessLicense(String businessLicense) {
+		this.businessLicense = businessLicense;
 	}
 	
 	@Length(min=0, max=20, message="商户名称长度必须介于 0 和 20 之间")
@@ -250,6 +254,15 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 
 	public void setIdCard(String idCard) {
 		this.idCard = idCard;
+	}
+	
+	@Length(min=0, max=20, message="机具类型长度必须介于 0 和 20 之间")
+	public String getMachineType() {
+		return machineType;
+	}
+
+	public void setMachineType(String machineType) {
+		this.machineType = machineType;
 	}
 	
 	@Length(min=0, max=100, message="银行卡号长度必须介于 0 和 100 之间")

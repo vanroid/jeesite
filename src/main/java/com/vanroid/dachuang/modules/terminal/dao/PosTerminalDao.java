@@ -8,7 +8,7 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
 
 /**
- * POS终端DAO接口
+ * 终端设备DAO接口
  * @author CGZ
  * @version 2016-10-26
  */
