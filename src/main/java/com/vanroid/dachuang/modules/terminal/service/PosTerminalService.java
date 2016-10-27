@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.entity.User;
@@ -29,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * POS终端Service
@@ -40,6 +40,14 @@ import java.util.logging.Logger;
 @Service
 @Transactional(readOnly = true)
 public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal> {
+
+
+    @Autowired
+    SystemService systemService;
+
+    @Autowired
+    OfficeService officeService;
+
 
     public PosTerminal get(String id) {
         PosTerminal posTerminal = super.get(id);
@@ -92,25 +100,25 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
      * @return 增加终端数
      */
     public int importTerminals(String fileName) {
-        logger.debug("开始导入终端");
-        int terminalCnt = 0;
+        int count = 0;
 
         List<User> users = Lists.newArrayList();
 
         Map<String, List<PosTerminal>> userMap = Maps.newHashMap();
 
         try {
-            // 第二个参数已无作用
-            ImportExcel importExcel = new ImportExcel(fileName, 0);
+            ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/大创电子---商户详情表.xlsx", 1);
 
             int rows = importExcel.getLastDataRowNum();
             // 遍历每一行,收集 以登录名为key,其他数据为value的map
             for (int i = 1; i < rows; i++) {
+                System.out.println(count);
                 Row row = importExcel.getRow(i);
-
                 // 没有终端号的视为无效记录,停止往下执行
+
+
                 if (ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
-                    return terminalCnt;
+                    return count;
                 }
 
                 String loginName = row.getCell(24).getStringCellValue();
@@ -127,11 +135,8 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
                 userMap.put(loginName, userPosTerminals);
 
-                terminalCnt++;
+                count++;
             }
-            logger.info("共导入终端数:" + terminalCnt);
-
-            int userCnt = 0;
 
             // 插入机构\部门\用户
             Set<String> userLoginNames = userMap.keySet();
@@ -168,10 +173,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 }
                 // 批量插入
                 // terminalService.save(terminals);
-
-                userCnt++;
             }
-            logger.info("共导入用户数：" + userCnt);
 
 
         } catch (InvalidFormatException e) {
@@ -179,16 +181,16 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return terminalCnt;
+        return count;
     }
 
     private void excelRowToPosterminal(PosTerminal posTerminal, Row row) {
         // 进件日期
-        posTerminal.setImportDate(ExcelUtils.getDateCellValue(row, 0));
+        posTerminal.setImportDate(ExcelUtils.getDateCellValue(row,0));
         //下机日期
-        posTerminal.setDownDate(ExcelUtils.getDateCellValue(row, 1));
+        posTerminal.setDownDate(ExcelUtils.getDateCellValue(row,1));
         // 装机日期
-        posTerminal.setInstallDate(ExcelUtils.getDateCellValue(row, 2));
+        posTerminal.setInstallDate(ExcelUtils.getDateCellValue(row,2));
 
     }
 
