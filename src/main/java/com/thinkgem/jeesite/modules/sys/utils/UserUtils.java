@@ -299,7 +299,7 @@ public class UserUtils {
         try {
             getSession().removeAttribute(key);
         } catch (UnavailableSecurityManagerException e) {
-            logger.error("清除缓存出错:{}", e);
+            logger.error("清除缓存出错:{}", e.getMessage());
         }
     }
 
