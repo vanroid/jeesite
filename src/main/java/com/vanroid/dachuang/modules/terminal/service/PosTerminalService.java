@@ -8,16 +8,22 @@ import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
+import com.thinkgem.jeesite.modules.sys.entity.Area;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.service.OfficeService;
+import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
+import com.vanroid.dachuang.common.StatusConstants;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
 import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +42,12 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal> {
+
+    @Autowired
+    private OfficeService officeService;
+
+    @Autowired
+    private SystemService systemService;
 
     public PosTerminal get(String id) {
         PosTerminal posTerminal = super.get(id);
@@ -87,6 +99,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
      * @param fileName 文件路径
      * @return 增加终端数
      */
+    @Transactional(readOnly = false)
     public int importTerminals(String fileName) {
         logger.debug("开始导入终端");
         int terminalCnt = 0;
@@ -131,29 +144,53 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
             // 插入机构\部门\用户
             Set<String> userLoginNames = userMap.keySet();
-            // todo 获取根机构
+            // 获取根机构
             Office rootOffice = new Office();
             rootOffice.setId(Global.getRootOfficeId());
-
+            Area rootArea = new Area();
+            rootArea.setId(Global.getRootAreaId());
+            // 操作用户
+            User curUser = UserUtils.getUser();
+            if (curUser == null || StringUtils.isBlank(curUser.getId())) { // 使用默认导入操作
+                curUser = UserUtils.get(Global.getDefaultUserId());
+            }
+            logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
             for (String loginName : userLoginNames) {
+
                 // 机构
                 Office company = new Office();
                 company.setName(loginName);
-                //officeService.save(company);
-                // todo 所有上传的数据都是在[大创电子总公司之下]
+                company.setType(StatusConstants.OFFICE_TYPE_COMPANY);
+                company.setArea(rootArea);
+                company.setCreateBy(curUser);
+                company.setUpdateBy(curUser);
+
+
+                // todo 测试标识
+                company.setAddress("test");
+                officeService.save(company);
+                // 所有机构都是在[大创电子总公司之下]
                 company.setParent(rootOffice);
 
                 // 部门
                 Office office = new Office();
                 office.setName(loginName);
                 office.setParent(company);
-                //officeService.save(office);
+                office.setType(StatusConstants.OFFICE_TYPE_OFFICE);
+                office.setArea(rootArea);
+                office.setCreateBy(curUser);
+                office.setUpdateBy(curUser);
+                // todo 测试标识
+                office.setAddress("test");
+                officeService.save(office);
 
                 // 用户
                 User user = new User();
                 user.setLoginName(loginName);
                 user.setCompany(company);
                 user.setOffice(office);
+                // todo 测试标识
+                user.setPhone("test");
                 //systemService.saveUser(user);
 
                 // 插入终端
@@ -163,7 +200,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                     posTerminal.setUser(user);
                 }
                 // 批量插入
-                // terminalService.save(terminals);
+                //terminalService.save(terminals);
 
                 userCnt++;
             }
