@@ -10,6 +10,22 @@ import java.util.Date;
  * Excel处理工具类
  */
 public class ExcelUtils {
+
+
+    public static String getStringCellValue(Row row, int colNum) {
+        Cell cell = row.getCell(colNum);
+        if (cell != null) {
+            int cellType = cell.getCellType();
+            if (cellType == Cell.CELL_TYPE_ERROR)
+                return null;
+            if (cellType == Cell.CELL_TYPE_NUMERIC) {
+                return String.valueOf(cell.getNumericCellValue());
+            }
+            return cell.getStringCellValue();
+        }
+        return null;
+    }
+
     public static Date getDateCellValue(Row row, int colNum) {
         Cell cell = row.getCell(colNum);
         if (cell != null) {
@@ -30,4 +46,6 @@ public class ExcelUtils {
         }
         return true;
     }
+
+
 }

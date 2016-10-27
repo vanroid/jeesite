@@ -8,12 +8,9 @@ import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
-import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.entity.User;
-import com.thinkgem.jeesite.modules.sys.service.OfficeService;
-import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
@@ -21,7 +18,6 @@ import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,14 +36,6 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal> {
-
-
-    @Autowired
-    SystemService systemService;
-
-    @Autowired
-    OfficeService officeService;
-
 
     public PosTerminal get(String id) {
         PosTerminal posTerminal = super.get(id);
@@ -100,25 +88,25 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
      * @return 增加终端数
      */
     public int importTerminals(String fileName) {
-        int count = 0;
+        logger.debug("开始导入终端");
+        int terminalCnt = 0;
 
         List<User> users = Lists.newArrayList();
 
         Map<String, List<PosTerminal>> userMap = Maps.newHashMap();
 
         try {
-            ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/大创电子---商户详情表.xlsx", 1);
+            // 第二个参数已无作用
+            ImportExcel importExcel = new ImportExcel(fileName, 0);
 
             int rows = importExcel.getLastDataRowNum();
             // 遍历每一行,收集 以登录名为key,其他数据为value的map
             for (int i = 1; i < rows; i++) {
-                System.out.println(count);
                 Row row = importExcel.getRow(i);
-                // 没有终端号的视为无效记录,停止往下执行
 
-
-                if (ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
-                    return count;
+                // 没有[商户号][终端号][后台账户]的视为无效记录,停止往下执行
+                if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
+                    break;
                 }
 
                 String loginName = row.getCell(24).getStringCellValue();
@@ -135,8 +123,11 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
                 userMap.put(loginName, userPosTerminals);
 
-                count++;
+                terminalCnt++;
             }
+            logger.debug("共导入终端数:" + terminalCnt);
+
+            int userCnt = 0;
 
             // 插入机构\部门\用户
             Set<String> userLoginNames = userMap.keySet();
@@ -173,7 +164,10 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 }
                 // 批量插入
                 // terminalService.save(terminals);
+
+                userCnt++;
             }
+            logger.debug("共导入用户数：" + userCnt);
 
 
         } catch (InvalidFormatException e) {
@@ -181,16 +175,64 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return count;
+        return terminalCnt;
     }
 
     private void excelRowToPosterminal(PosTerminal posTerminal, Row row) {
         // 进件日期
-        posTerminal.setImportDate(ExcelUtils.getDateCellValue(row,0));
+        posTerminal.setImportDate(ExcelUtils.getDateCellValue(row, 0));
         //下机日期
-        posTerminal.setDownDate(ExcelUtils.getDateCellValue(row,1));
+        posTerminal.setDownDate(ExcelUtils.getDateCellValue(row, 1));
         // 装机日期
-        posTerminal.setInstallDate(ExcelUtils.getDateCellValue(row,2));
+        posTerminal.setInstallDate(ExcelUtils.getDateCellValue(row, 2));
+        // 交件支行
+        posTerminal.setTransBank(ExcelUtils.getStringCellValue(row, 3));
+        // 机身号
+        posTerminal.setDeviceNum(ExcelUtils.getStringCellValue(row, 4));
+        // 机子型号
+        posTerminal.setDeviceType(ExcelUtils.getStringCellValue(row, 5));
+        // 商户号
+        posTerminal.setMerchantNum(ExcelUtils.getStringCellValue(row, 6));
+        // 终端号
+        posTerminal.setDeviceNum(ExcelUtils.getStringCellValue(row, 7));
+        // 微信二维码
+        posTerminal.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
+        // 营业执照号码
+        posTerminal.setBusinessLicense(ExcelUtils.getStringCellValue(row, 9));
+        // 商户名称
+        posTerminal.setMerchantName(ExcelUtils.getStringCellValue(row, 10));
+        // 地址
+        posTerminal.setMerchantName(ExcelUtils.getStringCellValue(row, 11));
+        // 法人
+        posTerminal.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 12));
+        // 入账人
+        posTerminal.setBookingPerson(ExcelUtils.getStringCellValue(row, 13));
+        // 联系电话
+        posTerminal.setTelphone(ExcelUtils.getStringCellValue(row, 14));
+        // 装机电话
+        posTerminal.setInstallPhone(ExcelUtils.getStringCellValue(row, 15));
+        // MCC码
+        posTerminal.setDeviceMcc(ExcelUtils.getStringCellValue(row, 16));
+        // 借记卡费率
+        posTerminal.setDebitRate(ExcelUtils.getStringCellValue(row, 17));
+        // 贷记卡费率
+        posTerminal.setCreditRate(ExcelUtils.getStringCellValue(row, 18));
+        // 外币卡费率
+        posTerminal.setForeignRate(ExcelUtils.getStringCellValue(row, 19));
+        // 机具类型
+        posTerminal.setMachineType(ExcelUtils.getStringCellValue(row, 20));
+        // 身份证号码
+        posTerminal.setIdCard(ExcelUtils.getStringCellValue(row, 21));
+        // 银行卡
+        posTerminal.setBankCard(ExcelUtils.getStringCellValue(row, 22));
+        // 银行卡开户行
+        posTerminal.setBankCardAccountBank(ExcelUtils.getStringCellValue(row, 23));
+
+        // 业务员
+        posTerminal.setSalesman(ExcelUtils.getStringCellValue(row, 25));
+        // 详情
+        posTerminal.setTerminalDesc(ExcelUtils.getStringCellValue(row, 26));
+
 
     }
 
