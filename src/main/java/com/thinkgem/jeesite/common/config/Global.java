@@ -3,16 +3,15 @@
  */
 package com.thinkgem.jeesite.common.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
-import org.springframework.core.io.DefaultResourceLoader;
-
 import com.ckfinder.connector.ServletContextFactory;
 import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.utils.PropertiesLoader;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import org.springframework.core.io.DefaultResourceLoader;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * 全局配置类
@@ -196,5 +195,9 @@ public class Global {
 
     public static String getDefaultUserId() {
         return getConfig("dc.defaultUserId");
+    }
+
+    public static String getAgentRoleId() {
+        return getConfig("dc.agentRoleId");
     }
 }

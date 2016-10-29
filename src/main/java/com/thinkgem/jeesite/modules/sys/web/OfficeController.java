@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.vanroid.dachuang.common.StatusConstants;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -102,13 +103,6 @@ public class OfficeController extends BaseController {
         }
         if (!beanValidator(model, office)) {
             return form(office, model);
-        }
-        // 目前新增机构只能新增公司类型
-        // 每个公司下默认设有[总部]部门，为了避免将总部设为公司
-        if (!office.getName().equals("总部")) {
-            office.setType("1");
-        } else {
-            office.setType("2");
         }
 
         officeService.save(office);

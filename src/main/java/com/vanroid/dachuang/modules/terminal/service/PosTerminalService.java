@@ -12,10 +12,12 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.entity.Area;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
+import com.thinkgem.jeesite.modules.sys.entity.Role;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.service.OfficeService;
 import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.vanroid.dachuang.common.DaChuangUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.common.StatusConstants;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
@@ -119,6 +121,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
                 // 没有[商户号][终端号][后台账户]的视为无效记录,停止往下执行
                 if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
+                    logger.debug("导入信息时发现必需字段缺失，行数：{}", i);
                     break;
                 }
 
@@ -130,20 +133,25 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 }
                 PosTerminal posTerminal = new PosTerminal();
                 // 为字段赋值
-                excelRowToPosterminal(posTerminal, row);
-
+                try {
+                    excelRowToPosterminal(posTerminal, row);
+                }catch (Exception e){
+                    logger.error("字段中存在错误值，行数：{}",i);
+                    throw new RuntimeException(e);
+                }
                 userPosTerminals.add(posTerminal);
 
                 userMap.put(loginName, userPosTerminals);
 
                 terminalCnt++;
             }
-            logger.debug("共导入终端数:" + terminalCnt);
 
             int userCnt = 0;
 
             // 插入机构\部门\用户
             Set<String> userLoginNames = userMap.keySet();
+            logger.debug("检测到用户数量：{}", userLoginNames.size());
+
             // 获取根机构
             Office rootOffice = new Office();
             rootOffice.setId(Global.getRootOfficeId());
@@ -164,22 +172,24 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 company.setArea(rootArea);
                 company.setCreateBy(curUser);
                 company.setUpdateBy(curUser);
+                company.setUseable(StatusConstants.OFFICE_USEABLE_ENABLE);
+                // 所有导入的机构都是在[代理商之下]
+                company.setParent(rootOffice);
 
 
                 // todo 测试标识
                 company.setAddress("test");
                 officeService.save(company);
-                // 所有机构都是在[大创电子总公司之下]
-                company.setParent(rootOffice);
 
                 // 部门
                 Office office = new Office();
-                office.setName(loginName);
+                office.setName(StatusConstants.OFFICE_DEFULT_OFFICE_NAME);
                 office.setParent(company);
                 office.setType(StatusConstants.OFFICE_TYPE_OFFICE);
                 office.setArea(rootArea);
                 office.setCreateBy(curUser);
                 office.setUpdateBy(curUser);
+                office.setUseable(StatusConstants.OFFICE_USEABLE_ENABLE);
                 // todo 测试标识
                 office.setAddress("test");
                 officeService.save(office);
@@ -189,9 +199,18 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 user.setLoginName(loginName);
                 user.setCompany(company);
                 user.setOffice(office);
-                // todo 测试标识
-                user.setPhone("test");
-                //systemService.saveUser(user);
+                user.setCreateBy(curUser);
+                user.setUpdateBy(curUser);
+                user.setPassword(SystemService.entryptPassword(StatusConstants.USER_DEFAULT_PASSWORD));
+                user.setName(loginName);
+                user.setRemarks(StatusConstants.USER_DEFAULT_REMARKS);
+                // 代理商角色
+                List<Role> roles = Lists.newArrayList();
+                roles.add(new Role(Global.getAgentRoleId()));
+                user.setRoleList(roles);
+
+
+                systemService.saveUser(user);
 
                 // 插入终端
                 List<PosTerminal> terminals = userMap.get(loginName);
@@ -201,7 +220,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 }
                 // 批量插入
                 //terminalService.save(terminals);
-
+                logger.debug("共导入终端数:" + terminalCnt);
                 userCnt++;
             }
             logger.debug("共导入用户数：" + userCnt);

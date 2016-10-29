@@ -60,14 +60,14 @@
 				<form:input path="code" htmlEscape="false" maxlength="50"/>
 			</div>
 		</div>
-		<%--<div class="control-group">
+		<div class="control-group">
 			<label class="control-label">机构类型:</label>
 			<div class="controls">
 				<form:select path="type" class="input-medium">
 					<form:options items="${fns:getDictList('sys_office_type')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</div>
-		</div>--%>
+		</div>
 		<%--<div class="control-group">
 			<label class="control-label">机构级别:</label>
 			<div class="controls">

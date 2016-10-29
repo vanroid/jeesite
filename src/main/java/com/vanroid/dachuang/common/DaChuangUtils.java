@@ -38,4 +38,9 @@ public class DaChuangUtils {
         logger.error("没有找到[总部]部门");
         return null;
     }
+
+    public static void exceptionInTest() {
+        if (true)
+            throw new RuntimeException("test");
+    }
 }
