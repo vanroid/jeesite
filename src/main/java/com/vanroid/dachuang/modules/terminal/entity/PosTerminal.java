@@ -193,7 +193,7 @@ public class PosTerminal extends DataEntity<PosTerminal> {
 		this.bookingPerson = bookingPerson;
 	}
 	
-	@Length(min=0, max=18, message="联系电话长度必须介于 0 和 18 之间")
+	@Length(min=0, max=100, message="联系电话长度必须介于 0 和 100 之间")
 	public String getTelphone() {
 		return telphone;
 	}

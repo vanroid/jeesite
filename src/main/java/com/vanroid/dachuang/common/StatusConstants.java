@@ -20,4 +20,8 @@ public class StatusConstants {
     public static final String USER_DEFAULT_REMARKS = "test";
     public static final String OFFICE_DEFULT_OFFICE_NAME = "总部"; // 默认部门名称
 
+    /**
+     * Terminal相关常量
+     */
+    public static final String TERMINAL_DEFAULT_REMARKS = "test";
 }

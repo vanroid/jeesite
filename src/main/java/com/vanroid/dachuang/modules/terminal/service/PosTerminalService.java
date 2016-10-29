@@ -217,9 +217,12 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 for (PosTerminal posTerminal : terminals) {
                     // 后台编号,所属用户
                     posTerminal.setUser(user);
+                    posTerminal.setCreateBy(curUser);
+                    posTerminal.setUpdateBy(curUser);
+                    // todo 测试标识
+                    posTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
+                    this.save(posTerminal);
                 }
-                // 批量插入
-                //terminalService.save(terminals);
                 logger.debug("共导入终端数:" + terminalCnt);
                 userCnt++;
             }
@@ -250,7 +253,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         // 商户号
         posTerminal.setMerchantNum(ExcelUtils.getStringCellValue(row, 6));
         // 终端号
-        posTerminal.setDeviceNum(ExcelUtils.getStringCellValue(row, 7));
+        posTerminal.setTermialNum(ExcelUtils.getStringCellValue(row, 7));
         // 微信二维码
         posTerminal.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
         // 营业执照号码
@@ -258,7 +261,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         // 商户名称
         posTerminal.setMerchantName(ExcelUtils.getStringCellValue(row, 10));
         // 地址
-        posTerminal.setMerchantName(ExcelUtils.getStringCellValue(row, 11));
+        posTerminal.setMerchantAddress(ExcelUtils.getStringCellValue(row, 11));
         // 法人
         posTerminal.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 12));
         // 入账人
