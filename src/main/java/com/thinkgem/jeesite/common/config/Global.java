@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public class Global {
 
+    public static boolean ENV_JUNIT_TEST = false;
     /**
      * 当前对象实例
      */

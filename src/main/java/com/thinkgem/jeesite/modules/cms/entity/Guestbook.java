@@ -3,16 +3,14 @@
  */
 package com.thinkgem.jeesite.modules.cms.entity;
 
-import java.util.Date;
-
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
-
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.IdGen;
 import com.thinkgem.jeesite.modules.sys.entity.User;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * 留言Entity

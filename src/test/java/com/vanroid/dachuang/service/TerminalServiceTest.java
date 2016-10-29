@@ -1,17 +1,17 @@
 package com.vanroid.dachuang.service;
 
 import com.thinkgem.jeesite.BaseTest;
+import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.SpringContextHolder;
-import com.thinkgem.jeesite.modules.sys.dao.OfficeDao;
-import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.service.OfficeService;
+import com.thinkgem.jeesite.modules.sys.service.SystemService;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
 import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,9 +21,7 @@ import java.sql.SQLException;
 /**
  * Created by cgz on 16-10-26.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath*:spring-context*.xml")
-public class TerminalServiceTest {
+public class TerminalServiceTest extends BaseTest {
 
     @Autowired
     private PosTerminalService terminalService;
@@ -31,7 +29,20 @@ public class TerminalServiceTest {
     @Autowired
     private OfficeService officeService;
 
+    @Autowired
+    private SystemService systemService;
 
+    @Test
+    public void testFindIdsByUser() {
+        terminalService.findIdsByUser();
+    }
+
+    @Test
+    public void testFindPageByUser() {
+        Page<PosTerminal> page = new Page<PosTerminal>();
+        PosTerminal posTerminal = new PosTerminal();
+        terminalService.findPageByUser(page, posTerminal);
+    }
 
     @Test
     public void testImport() {

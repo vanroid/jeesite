@@ -6,6 +6,7 @@ package com.vanroid.dachuang.modules.terminal.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,7 +50,9 @@ public class PosTerminalController extends BaseController {
 	@RequiresPermissions("terminal:posTerminal:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(PosTerminal posTerminal, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<PosTerminal> page = posTerminalService.findPage(new Page<PosTerminal>(request, response), posTerminal); 
+		Page<PosTerminal> page = posTerminalService.findPage(new Page<PosTerminal>(request, response), posTerminal);
+		//todo page = posTerminalService.findPageByOffice();
+
 		model.addAttribute("page", page);
 		return "modules/terminal/posTerminalList";
 	}

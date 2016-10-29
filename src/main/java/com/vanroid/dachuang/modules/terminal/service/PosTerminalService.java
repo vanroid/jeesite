@@ -17,7 +17,6 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.service.OfficeService;
 import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
-import com.vanroid.dachuang.common.DaChuangUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.common.StatusConstants;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
@@ -64,6 +63,42 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         return super.findPage(page, posTerminal);
     }
 
+    /**
+     * 查找某用户下所有终端id
+     */
+    public List<String> findIdsByUser(User user) {
+        return dao.findIdsByOffice(user.getCompany());
+    }
+
+    /**
+     * 查找当前用户的所有终端id
+     * @return
+     */
+    public List<String> findIdsByUser() {
+        User user = UserUtils.getUser();
+        return findIdsByUser(user);
+    }
+
+    /**
+     * 查找某用户下所有的终端
+     *
+     * @param page
+     * @param posTerminal
+     * @return
+     */
+    public Page<PosTerminal> findPageByUser(Page<PosTerminal> page, PosTerminal posTerminal) {
+
+        List<String> ids = findIdsByUser();
+        posTerminal.setPage(page);
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("list",ids);
+        map.put("page",page);
+
+        page.setList(dao.findListByIds(map));
+
+        return page;
+    }
+
     @Transactional(readOnly = false)
     public void save(PosTerminal posTerminal) {
         super.save(posTerminal);
@@ -87,7 +122,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
     public Map<String, Object> listAllData(User user, Date startTime, Date endTime) {
 
-        List<String> terminalIds = UserUtils.getAllTermialIds(user);
+        List<String> terminalIds = findIdsByUser();
 
         findBillsByTerminalIds(terminalIds);
 
@@ -135,8 +170,8 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 // 为字段赋值
                 try {
                     excelRowToPosterminal(posTerminal, row);
-                }catch (Exception e){
-                    logger.error("字段中存在错误值，行数：{}",i);
+                } catch (Exception e) {
+                    logger.error("字段中存在错误值，行数：{}", i);
                     throw new RuntimeException(e);
                 }
                 userPosTerminals.add(posTerminal);

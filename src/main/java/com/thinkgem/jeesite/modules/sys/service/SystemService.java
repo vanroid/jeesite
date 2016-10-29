@@ -3,19 +3,6 @@
  */
 package com.thinkgem.jeesite.modules.sys.service;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.identity.Group;
-import org.apache.shiro.session.Session;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.security.Digests;
@@ -36,6 +23,18 @@ import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.security.SystemAuthorizingRealm;
 import com.thinkgem.jeesite.modules.sys.utils.LogUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.identity.Group;
+import org.apache.shiro.session.Session;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 系统管理，安全相关实体的管理类,包括用户、角色、菜单.

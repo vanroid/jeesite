@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.modules.sys.utils;
 
 import java.util.List;
 
+import com.thinkgem.jeesite.common.config.Global;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
@@ -41,6 +42,7 @@ public class UserUtils {
     private static MenuDao menuDao = SpringContextHolder.getBean(MenuDao.class);
     private static AreaDao areaDao = SpringContextHolder.getBean(AreaDao.class);
     private static OfficeDao officeDao = SpringContextHolder.getBean(OfficeDao.class);
+
 
     public static final String USER_CACHE = "userCache";
     public static final String USER_CACHE_ID_ = "id_";
@@ -127,6 +129,9 @@ public class UserUtils {
      * @return 取不到返回 new User()
      */
     public static User getUser() {
+        if(Global.ENV_JUNIT_TEST){
+            return get(Global.getDefaultUserId());
+        }
         Principal principal = getPrincipal();
         if (principal != null) {
             User user = get(principal.getId());
@@ -303,10 +308,6 @@ public class UserUtils {
         }
     }
 
-    // 获取某用户的所有终端ID
-    public static List<String> getAllTermialIds(User user) {
-        return null;
-    }
 
 //	public static Map<String, Object> getCacheMap(){
 //		Principal principal = getPrincipal();
