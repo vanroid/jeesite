@@ -39,9 +39,10 @@ public class TerminalServiceTest extends BaseTest {
 
     @Test
     public void testFindPageByUser() {
-        Page<PosTerminal> page = new Page<PosTerminal>();
+        Page<PosTerminal> page = new Page<PosTerminal>(1,30);
         PosTerminal posTerminal = new PosTerminal();
-        terminalService.findPageByUser(page, posTerminal);
+        page = terminalService.findPageByUser(page, posTerminal);
+        System.out.print(page);
     }
 
     @Test

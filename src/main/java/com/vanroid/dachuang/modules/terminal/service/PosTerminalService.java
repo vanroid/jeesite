@@ -72,6 +72,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
     /**
      * 查找当前用户的所有终端id
+     *
      * @return
      */
     public List<String> findIdsByUser() {
@@ -90,10 +91,11 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
         List<String> ids = findIdsByUser();
         posTerminal.setPage(page);
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("list",ids);
-        map.put("page",page);
-
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("list", ids);
+        map.put("page", page);
+        map.put("DEL_FLAG_NORMAL", 0);
+        page.setCount(ids.size());
         page.setList(dao.findListByIds(map));
 
         return page;

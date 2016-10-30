@@ -25,6 +25,7 @@ import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
 
 /**
  * POS终端Controller
+ *
  * @author CGZ
  * @version 2016-10-26
  */
@@ -32,55 +33,55 @@ import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
 @RequestMapping(value = "${adminPath}/terminal/posTerminal")
 public class PosTerminalController extends BaseController {
 
-	@Autowired
-	private PosTerminalService posTerminalService;
-	
-	@ModelAttribute
-	public PosTerminal get(@RequestParam(required=false) String id) {
-		PosTerminal entity = null;
-		if (StringUtils.isNotBlank(id)){
-			entity = posTerminalService.get(id);
-		}
-		if (entity == null){
-			entity = new PosTerminal();
-		}
-		return entity;
-	}
-	
-	@RequiresPermissions("terminal:posTerminal:view")
-	@RequestMapping(value = {"list", ""})
-	public String list(PosTerminal posTerminal, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<PosTerminal> page = posTerminalService.findPage(new Page<PosTerminal>(request, response), posTerminal);
-		//todo page = posTerminalService.findPageByOffice();
+    @Autowired
+    private PosTerminalService posTerminalService;
 
-		model.addAttribute("page", page);
-		return "modules/terminal/posTerminalList";
-	}
+    @ModelAttribute
+    public PosTerminal get(@RequestParam(required = false) String id) {
+        PosTerminal entity = null;
+        if (StringUtils.isNotBlank(id)) {
+            entity = posTerminalService.get(id);
+        }
+        if (entity == null) {
+            entity = new PosTerminal();
+        }
+        return entity;
+    }
 
-	@RequiresPermissions("terminal:posTerminal:view")
-	@RequestMapping(value = "form")
-	public String form(PosTerminal posTerminal, Model model) {
-		model.addAttribute("posTerminal", posTerminal);
-		return "modules/terminal/posTerminalForm";
-	}
+    @RequiresPermissions("terminal:posTerminal:view")
+    @RequestMapping(value = {"list", ""})
+    public String list(PosTerminal posTerminal, HttpServletRequest request, HttpServletResponse response, Model model) {
+        //Page<PosTerminal> page = posTerminalService.findPage(new Page<PosTerminal>(request, response), posTerminal);
+        Page<PosTerminal> page = posTerminalService.findPageByUser(new Page<PosTerminal>(request, response), posTerminal);
 
-	@RequiresPermissions("terminal:posTerminal:edit")
-	@RequestMapping(value = "save")
-	public String save(PosTerminal posTerminal, Model model, RedirectAttributes redirectAttributes) {
-		if (!beanValidator(model, posTerminal)){
-			return form(posTerminal, model);
-		}
-		posTerminalService.save(posTerminal);
-		addMessage(redirectAttributes, "保存POS终端成功");
-		return "redirect:"+Global.getAdminPath()+"/terminal/posTerminal/?repage";
-	}
-	
-	@RequiresPermissions("terminal:posTerminal:edit")
-	@RequestMapping(value = "delete")
-	public String delete(PosTerminal posTerminal, RedirectAttributes redirectAttributes) {
-		posTerminalService.delete(posTerminal);
-		addMessage(redirectAttributes, "删除POS终端成功");
-		return "redirect:"+Global.getAdminPath()+"/terminal/posTerminal/?repage";
-	}
+        model.addAttribute("page", page);
+        return "modules/terminal/posTerminalList";
+    }
+
+    @RequiresPermissions("terminal:posTerminal:view")
+    @RequestMapping(value = "form")
+    public String form(PosTerminal posTerminal, Model model) {
+        model.addAttribute("posTerminal", posTerminal);
+        return "modules/terminal/posTerminalForm";
+    }
+
+    @RequiresPermissions("terminal:posTerminal:edit")
+    @RequestMapping(value = "save")
+    public String save(PosTerminal posTerminal, Model model, RedirectAttributes redirectAttributes) {
+        if (!beanValidator(model, posTerminal)) {
+            return form(posTerminal, model);
+        }
+        posTerminalService.save(posTerminal);
+        addMessage(redirectAttributes, "保存POS终端成功");
+        return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
+    }
+
+    @RequiresPermissions("terminal:posTerminal:edit")
+    @RequestMapping(value = "delete")
+    public String delete(PosTerminal posTerminal, RedirectAttributes redirectAttributes) {
+        posTerminalService.delete(posTerminal);
+        addMessage(redirectAttributes, "删除POS终端成功");
+        return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
+    }
 
 }
