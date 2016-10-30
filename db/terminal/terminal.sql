@@ -3,7 +3,7 @@ SET SESSION FOREIGN_KEY_CHECKS=0;
 /* Drop Tables */
 
 DROP TABLE IF EXISTS ter_pos_terminal;
-
+DROP TABLE IF EXISTS ter_bill_day;
 
 
 
@@ -24,7 +24,7 @@ CREATE TABLE ter_pos_terminal
 	termial_num VARCHAR(20) NOT NULL COMMENT '终端号,重要字段',
   wechat_url VARCHAR(512) COMMENT '微信二维码',
   business_license VARCHAR(512) COMMENT '营业执照',
-  merchant_name VARCHAR(20) COMMENT '商户名称',
+  merchant_name VARCHAR(100) COMMENT '商户名称',
   merchant_address VARCHAR(512) COMMENT '地址',
   merchant_legal_person VARCHAR(10) COMMENT '法人',
   booking_person VARCHAR(10) COMMENT '入帐人',
@@ -50,3 +50,35 @@ CREATE TABLE ter_pos_terminal
 	del_flag char(1) DEFAULT '0' NOT NULL COMMENT '删除标记',
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = 'POS终端设备表';
+
+
+
+
+CREATE TABLE ter_bill_day
+(
+	id varchar(64) NOT NULL COMMENT '编号',
+
+  clear_date DATE NOT NULL COMMENT '清算日期',
+  tran_code VARCHAR(4) NOT NULL COMMENT '交易代码',
+  handle_code VARCHAR(10) COMMENT '受理流水',
+  tran_date_time VARCHAR(12) COMMENT '交易日期时间,EG:0613161722',
+  card_no VARCHAR(20) NOT NULL COMMENT '卡号',
+  tran_amount DOUBLE NOT NULL COMMENT '交易金额',
+  refer_code VARCHAR(20) COMMENT '参考号,EG:000313002980',
+  grant_code VARCHAR(10) COMMENT '授权码',
+  terminal_num VARCHAR(20) NOT NULL COMMENT '终端号,重要字段',
+  merchant_num VARCHAR(20) NOT NULL COMMENT '商户编号,重要字段',
+  merchant_name VARCHAR(100) COMMENT '商户名称',
+  debit_fee DOUBLE COMMENT '商户借记手续费',
+  credit_fee DOUBLE COMMENT '商户贷记手续费',
+
+	create_by varchar(64) NOT NULL COMMENT '创建者',
+	create_date datetime NOT NULL COMMENT '创建时间',
+	update_by varchar(64) NOT NULL COMMENT '更新者',
+	update_date datetime NOT NULL COMMENT '更新时间',
+	remarks varchar(255) COMMENT '备注信息',
+	del_flag char(1) DEFAULT '0' NOT NULL COMMENT '删除标记',
+	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = '终端日流水表';
+create index day_idx on ter_bill_day(clear_date);
+

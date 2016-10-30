@@ -1,5 +1,7 @@
 package com.thinkgem.jeesite.excel;
 
+import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.io.Files;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.service.OfficeService;
 import com.thinkgem.jeesite.modules.sys.service.SystemService;
@@ -9,8 +11,10 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import sun.nio.cs.StandardCharsets;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +32,26 @@ public class ExcelTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Test
+    public void testImportDayReport() {
+        try {
+            ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/LYGZ_20160613.xls", 100);
+            Cell c = importExcel.getRow(1).getCell(0);
+
+
+
+            System.out.println(c.getStringCellValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void testCsv() {
 
     }
 
