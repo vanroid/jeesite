@@ -23,7 +23,7 @@ public class TerBillDay extends DataEntity<TerBillDay> {
 	private String handleCode;		// 受理流水
 	private String tranDateTime;		// 交易日期时间
 	private String cardNo;		// 卡号
-	private String tranAmount;		// 交易金额
+	private Double tranAmount;		// 交易金额
 	private String referCode;		// 参考号
 	private String grantCode;		// 授权码
 	private String terminalNum;		// 终端号
@@ -88,11 +88,11 @@ public class TerBillDay extends DataEntity<TerBillDay> {
 		this.cardNo = cardNo;
 	}
 	
-	public String getTranAmount() {
+	public Double getTranAmount() {
 		return tranAmount;
 	}
 
-	public void setTranAmount(String tranAmount) {
+	public void setTranAmount(Double tranAmount) {
 		this.tranAmount = tranAmount;
 	}
 	

@@ -34,6 +34,18 @@ public class ExcelUtils {
         return null;
     }
 
+
+    public static Double getDoubleCellValue(Row row, int colNum) {
+        Cell cell = row.getCell(colNum);
+        if (cell != null) {
+            int cellType = cell.getCellType();
+            if (cellType == Cell.CELL_TYPE_NUMERIC) {
+                return cell.getNumericCellValue();
+            }
+        }
+        return 0d;
+    }
+
     /**
      * 判断单元格是否为空
      *
