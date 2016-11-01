@@ -59,7 +59,7 @@ CREATE TABLE ter_bill_day
 	id varchar(64) NOT NULL COMMENT '编号',
 
   clear_date DATE NOT NULL COMMENT '清算日期',
-  tran_code VARCHAR(4) NOT NULL COMMENT '交易代码',
+  tran_code VARCHAR(10) NOT NULL COMMENT '交易代码',
   handle_code VARCHAR(10) COMMENT '受理流水',
   tran_date_time VARCHAR(12) COMMENT '交易日期时间,EG:0613161722',
   card_no VARCHAR(20) NOT NULL COMMENT '卡号',

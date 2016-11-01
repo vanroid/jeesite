@@ -11,6 +11,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 import com.thinkgem.jeesite.modules.sys.entity.Area;
@@ -73,6 +74,8 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
     @Transactional(readOnly = false)
     public int importBillDays(String fileName) {
         logger.debug("开始导入帐单");
+        long start = System.currentTimeMillis();
+
         int billCnt = 0;
 
         try {
@@ -89,7 +92,7 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
                 Row row = importExcel.getRow(i);
 
                 // 没有[商户号][终端号]的视为无效记录,停止往下执行
-                if (ExcelUtils.cellIsBank(row.getCell(8)) || ExcelUtils.cellIsBank(row.getCell(9))) {
+                if (ExcelUtils.cellIsBank(row.getCell(0)) || ExcelUtils.cellIsBank(row.getCell(8)) || ExcelUtils.cellIsBank(row.getCell(9))) {
                     logger.debug("导入信息时发现必需字段缺失，行数：{}", i);
                     break;
                 }
@@ -98,6 +101,8 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
                 // 为字段赋值
                 try {
                     excelRowToBillDay(terBillDay, row, curUser);
+                    terBillDay.preInsert();
+                    terBillDay.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
                 } catch (Exception e) {
                     logger.error("字段中存在错误值，行数：{}", i);
                     throw new RuntimeException(e);
@@ -107,10 +112,12 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
 
             logger.debug("检测到记录数量：{}", terBillDays.size());
 
-            // todo batchinsert
+            // batchinsert
+            billCnt = dao.batchInsert(terBillDays);
 
 
             logger.debug("成功导入帐单记录数：" + billCnt);
+            logger.debug("耗时：{}", (System.currentTimeMillis() - start));
         } catch (InvalidFormatException e) {
             e.printStackTrace();
             logger.error("导入帐单出错:{}", e);
@@ -124,7 +131,8 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
     private void excelRowToBillDay(TerBillDay terBillDay, Row row, User curUser) {
         // 清算日期0	交易代码1	 受理流水2	交易日期时间3 	卡号4 	交易金额5	 参考号6	 授权码7	终端号8	商户编号9	 商户名称10	商户借记手续费11	商户贷记手续费12
         // 清算日期0
-        terBillDay.setClearDate(row.getCell(0).getDateCellValue());
+
+        terBillDay.setClearDate(DateUtils.parseDate(ExcelUtils.getStringCellValue(row, 0)));
         // 交易代码1
         terBillDay.setTranCode(ExcelUtils.getStringCellValue(row, 1));
         // 受理流水2

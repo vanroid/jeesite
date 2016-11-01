@@ -52,7 +52,7 @@ public class TerBillDay extends DataEntity<TerBillDay> {
 		this.clearDate = clearDate;
 	}
 	
-	@Length(min=1, max=4, message="交易代码长度必须介于 1 和 4 之间")
+	@Length(min=1, max=10, message="交易代码长度必须介于 1 和 10 之间")
 	public String getTranCode() {
 		return tranCode;
 	}

@@ -27,11 +27,11 @@
 		<ul class="ul-form">
 			<li><label>清算日期：</label>
 				<input name="beginClearDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${terBillDay.beginClearDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
+					value="<fmt:formatDate value="${terBillDay.beginClearDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/> -
 				<input name="endClearDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${terBillDay.endClearDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+					value="<fmt:formatDate value="${terBillDay.endClearDate}" pattern="yyyy-MM-dd"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
 			</li>
 			<li><label>终端号：</label>
 				<form:input path="terminalNum" htmlEscape="false" maxlength="20" class="input-medium"/>
@@ -61,9 +61,9 @@
 				<th>终端号</th>
 				<th>商户编号</th>
 				<th>商户名称</th>
-				<th>商户借记手续费</th>
-				<th>商户贷记手续费</th>
-				<th>更新时间</th>
+				<th>借记手续费</th>
+				<th>贷记手续费</th>
+				<%--<th>更新时间</th>--%>
 				<shiro:hasPermission name="terminal:terBillDay:edit"><th>操作</th></shiro:hasPermission>
 			</tr>
 		</thead>
@@ -71,7 +71,7 @@
 		<c:forEach items="${page.list}" var="terBillDay">
 			<tr>
 				<td><a href="${ctx}/terminal/terBillDay/form?id=${terBillDay.id}">
-					<fmt:formatDate value="${terBillDay.clearDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					<fmt:formatDate value="${terBillDay.clearDate}" pattern="yyyy-MM-dd"/>
 				</a></td>
 				<td>
 					${terBillDay.tranCode}
@@ -109,9 +109,9 @@
 				<td>
 					${terBillDay.creditFee}
 				</td>
-				<td>
+				<%--<td>
 					<fmt:formatDate value="${terBillDay.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
-				</td>
+				</td>--%>
 				<%--<shiro:hasPermission name="terminal:terBillDay:edit"><td>
     				<a href="${ctx}/terminal/terBillDay/form?id=${terBillDay.id}">修改</a>
 					<a href="${ctx}/terminal/terBillDay/delete?id=${terBillDay.id}" onclick="return confirmx('确认要删除该消费日流水吗？', this.href)">删除</a>

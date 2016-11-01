@@ -159,5 +159,54 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
+
+	<insert id="batchInsert">
+		INSERT INTO ter_bill_day(
+		id,
+		clear_date,
+		tran_code,
+		handle_code,
+		tran_date_time,
+		card_no,
+		tran_amount,
+		refer_code,
+		grant_code,
+		terminal_num,
+		merchant_num,
+		merchant_name,
+		debit_fee,
+		credit_fee,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES
+		<foreach collection="list" separator="," item="bill">
+		(
+		#{bill.id},
+		#{bill.clearDate},
+		#{bill.tranCode},
+		#{bill.handleCode},
+		#{bill.tranDateTime},
+		#{bill.cardNo},
+		#{bill.tranAmount},
+		#{bill.referCode},
+		#{bill.grantCode},
+		#{bill.terminalNum},
+		#{bill.merchantNum},
+		#{bill.merchantName},
+		#{bill.debitFee},
+		#{bill.creditFee},
+		#{bill.createBy.id},
+		#{bill.createDate},
+		#{bill.updateBy.id},
+		#{bill.updateDate},
+		#{bill.remarks},
+		#{bill.delFlag}
+		)
+		</foreach>
+	</insert>
 	
 </mapper>
