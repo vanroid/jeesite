@@ -27,6 +27,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,9 @@ import com.vanroid.dachuang.modules.terminal.dao.TerBillDayDao;
 @Transactional(readOnly = true)
 public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
 
+    @Autowired
+    private PosTerminalService posTerminalService;
+
 
     public TerBillDay get(String id) {
         return super.get(id);
@@ -56,6 +60,22 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
 
     public Page<TerBillDay> findPage(Page<TerBillDay> page, TerBillDay terBillDay) {
         return super.findPage(page, terBillDay);
+    }
+
+    public Page<TerBillDay> findPageByUser(Page<TerBillDay> page, TerBillDay terBillDay) {
+
+        terBillDay.setPage(page);
+        // 1.查找当前用户所有的terminalId
+        List<String> terIds = posTerminalService.findIdsByUser();
+        // 2.关联terminal与bill查询
+        int rowCnt = dao.countByTerIds(terIds);
+        logger.debug("找到所属用户{}帐单记录数：{}", UserUtils.getUser().getName(), rowCnt);
+        page.setCount(rowCnt);
+        Map params = Maps.newHashMap();
+        params.put("bill", terBillDay);
+        params.put("list", terIds);
+        page.setList(dao.findListByTerIds(params));
+        return page;
     }
 
     @Transactional(readOnly = false)

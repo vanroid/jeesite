@@ -6,6 +6,7 @@ import com.thinkgem.jeesite.common.utils.SpringContextHolder;
 import com.thinkgem.jeesite.modules.sys.service.OfficeService;
 import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
+import com.vanroid.dachuang.modules.terminal.entity.TerBillDay;
 import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
 import com.vanroid.dachuang.modules.terminal.service.TerBillDayService;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -22,6 +23,14 @@ public class TerBillDayServiceTest extends BaseTest {
 
     @Autowired
     private TerBillDayService terBillDayService;
+
+    @Test
+    public void testFindByTerIds() {
+        Page<TerBillDay> page = new Page<TerBillDay>(1, 30);
+        TerBillDay terBillDay = new TerBillDay();
+        page = terBillDayService.findPageByUser(page, terBillDay);
+        System.out.print(page);
+    }
 
     @Test
     public void testImport() {

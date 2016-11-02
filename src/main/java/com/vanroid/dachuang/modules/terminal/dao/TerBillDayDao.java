@@ -8,6 +8,7 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.terminal.entity.TerBillDay;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消费日流水DAO接口
@@ -19,4 +20,15 @@ import java.util.List;
 public interface TerBillDayDao extends CrudDao<TerBillDay> {
 
     int batchInsert(List<TerBillDay> terBillDays);
+
+    List<TerBillDay> findListByTerIds(Map params);
+
+    /**
+     * 通过terminal的id列表查找所有的记录数
+     *
+     * @param terIds
+     * @return
+     */
+
+    int countByTerIds(List<String> terIds);
 }

@@ -91,7 +91,7 @@
 				ORDER BY a.update_date DESC, a.termial_num
 			</otherwise>
 		</choose>
-		limit ${page.pageNo},${page.pageSize}
+		limit ${page.pageNo-1},${page.pageSize}
 	</select>
 
 	<select id="findIdsByOffice" resultType="String">

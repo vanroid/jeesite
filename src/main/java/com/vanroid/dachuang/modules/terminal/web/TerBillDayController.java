@@ -49,7 +49,8 @@ public class TerBillDayController extends BaseController {
 	@RequiresPermissions("terminal:terBillDay:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(TerBillDay terBillDay, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TerBillDay> page = terBillDayService.findPage(new Page<TerBillDay>(request, response), terBillDay); 
+		//Page<TerBillDay> page = terBillDayService.findPage(new Page<TerBillDay>(request, response), terBillDay);
+		Page<TerBillDay> page = terBillDayService.findPageByUser(new Page<TerBillDay>(request, response), terBillDay);
 		model.addAttribute("page", page);
 		return "modules/terminal/terBillDayList";
 	}
