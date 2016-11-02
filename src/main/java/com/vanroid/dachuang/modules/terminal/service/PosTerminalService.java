@@ -22,13 +22,12 @@ import com.vanroid.dachuang.common.StatusConstants;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
 import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +138,30 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
      * @return 增加终端数
      */
     @Transactional(readOnly = false)
-    public int importTerminals(String fileName) {
+    public Map<String, Object> importTerminals(String fileName) {
+        Map<String, Object> result = null;
+        try {
+            ImportExcel importExcel = new ImportExcel(fileName, 0);
+            result = importTerminals(importExcel);
+        } catch (Exception e) {
+            logger.debug("导入出错：{}", e);
+        }
+        return result;
+    }
+
+    @Transactional(readOnly = false)
+    public Map<String, Object> importTerminals(MultipartFile file) {
+        Map<String, Object> result = null;
+        try {
+            ImportExcel importExcel = new ImportExcel(file, 0, 0);
+            result = importTerminals(importExcel);
+        } catch (Exception e) {
+            logger.debug("导入出错：{}", e);
+        }
+        return result;
+    }
+
+    private Map<String, Object> importTerminals(ImportExcel importExcel) {
         logger.debug("开始导入终端");
         int terminalCnt = 0;
 
@@ -147,60 +169,74 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
         Map<String, List<PosTerminal>> userMap = Maps.newHashMap();
 
-        try {
-            // 第二个参数已无作用
-            ImportExcel importExcel = new ImportExcel(fileName, 0);
+        int rows = importExcel.getLastDataRowNum();
+        // 遍历每一行,收集 以登录名为key,其他数据为value的map
+        for (int i = 1; i < rows; i++) {
+            Row row = importExcel.getRow(i);
 
-            int rows = importExcel.getLastDataRowNum();
-            // 遍历每一行,收集 以登录名为key,其他数据为value的map
-            for (int i = 1; i < rows; i++) {
-                Row row = importExcel.getRow(i);
-
-                // 没有[商户号][终端号][后台账户]的视为无效记录,停止往下执行
-                if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
-                    logger.debug("导入信息时发现必需字段缺失，行数：{}", i);
-                    break;
-                }
-
-                String loginName = row.getCell(24).getStringCellValue();
-                // 获取此用户下的所有终端
-                List<PosTerminal> userPosTerminals = userMap.get(loginName);
-                if (userPosTerminals == null) {
-                    userPosTerminals = Lists.newArrayList();
-                }
-                PosTerminal posTerminal = new PosTerminal();
-                // 为字段赋值
-                try {
-                    excelRowToPosterminal(posTerminal, row);
-                } catch (Exception e) {
-                    logger.error("字段中存在错误值，行数：{}", i);
-                    throw new RuntimeException(e);
-                }
-                userPosTerminals.add(posTerminal);
-
-                userMap.put(loginName, userPosTerminals);
-
-                terminalCnt++;
+            // 没有[商户号][终端号][后台账户]的视为无效记录,停止往下执行
+            if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
+                logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", i);
+                break;
             }
 
-            int userCnt = 0;
-
-            // 插入机构\部门\用户
-            Set<String> userLoginNames = userMap.keySet();
-            logger.debug("检测到用户数量：{}", userLoginNames.size());
-
-            // 获取根机构
-            Office rootOffice = new Office();
-            rootOffice.setId(Global.getRootOfficeId());
-            Area rootArea = new Area();
-            rootArea.setId(Global.getRootAreaId());
-            // 操作用户
-            User curUser = UserUtils.getUser();
-            if (curUser == null || StringUtils.isBlank(curUser.getId())) { // 使用默认导入操作
-                curUser = UserUtils.get(Global.getDefaultUserId());
+            String loginName = row.getCell(24).getStringCellValue();
+            // 获取此用户下的所有终端
+            List<PosTerminal> userPosTerminals = userMap.get(loginName);
+            if (userPosTerminals == null) {
+                userPosTerminals = Lists.newArrayList();
             }
-            logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
-            for (String loginName : userLoginNames) {
+            PosTerminal posTerminal = new PosTerminal();
+            // 为字段赋值
+            try {
+                excelRowToPosterminal(posTerminal, row);
+            } catch (Exception e) {
+                logger.error("字段中存在错误值，行数：{}", i);
+                throw new RuntimeException(e);
+            }
+            userPosTerminals.add(posTerminal);
+
+            userMap.put(loginName, userPosTerminals);
+
+        }
+
+        int userCnt = 0;
+
+        // 插入机构\部门\用户
+        Set<String> userLoginNames = userMap.keySet();
+
+        if (userLoginNames == null || userLoginNames.size() == 0) {
+            logger.debug("检测不到用户，退出执行");
+            Map<String, Object> result = Maps.newHashMap();
+            result.put(StatusConstants.SERVICE_RESULT_MESSAGE, "检测不到用户，退出执行");
+            return result;
+        }
+
+        logger.debug("检测到用户数量：{}", userLoginNames.size());
+
+        // 获取根机构
+        Office rootOffice = new Office();
+        rootOffice.setId(Global.getRootOfficeId());
+        Area rootArea = new Area();
+        rootArea.setId(Global.getRootAreaId());
+        // 操作用户
+        User curUser = UserUtils.getUser();
+        if (curUser == null || StringUtils.isBlank(curUser.getId())) { // 使用默认导入操作
+            curUser = UserUtils.get(Global.getDefaultUserId());
+        }
+        logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
+
+
+        // 查的所有公司机构的名称，
+        List<String> companyNames = officeService.findNameList();
+        // 查找所有的终端ID，避免重复
+        List<String> terNums = findTerNumList();
+        for (String loginName : userLoginNames) {
+            // 检测重复
+            if (companyNames.contains(loginName)) {
+                logger.debug("检测到重复机构[{}]，已跳过插入", loginName);
+
+            } else {
 
                 // 机构
                 Office company = new Office();
@@ -248,30 +284,53 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
 
                 systemService.saveUser(user);
-
-                // 插入终端
-                List<PosTerminal> terminals = userMap.get(loginName);
-                for (PosTerminal posTerminal : terminals) {
-                    // 后台编号,所属用户
-                    posTerminal.setUser(user);
-                    posTerminal.setCreateBy(curUser);
-                    posTerminal.setUpdateBy(curUser);
-                    // todo 测试标识
-                    posTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
-                    this.save(posTerminal);
-                }
-                logger.debug("共导入终端数:" + terminalCnt);
                 userCnt++;
             }
-            logger.debug("共导入用户数：" + userCnt);
 
+            User user = UserUtils.getByLoginName(loginName);
 
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            // 插入终端
+            List<PosTerminal> terminals = userMap.get(loginName);
+            for (PosTerminal posTerminal : terminals) {
+
+                if (terNums.contains(posTerminal.getTermialNum())) {
+                    logger.debug("检测到重复终端号[{}]，归属用户[{}],已跳过插入", posTerminal.getTermialNum(), loginName);
+                    continue;
+                }
+
+                // 后台编号,所属用户
+                posTerminal.setUser(user);
+                posTerminal.setCreateBy(curUser);
+                posTerminal.setUpdateBy(curUser);
+                // todo 测试标识
+                posTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
+                this.save(posTerminal);
+                terminalCnt++;
+            }
+            logger.debug("共导入终端数:" + terminalCnt);
+
         }
-        return terminalCnt;
+        logger.debug("共导入用户数：" + userCnt);
+
+        Map result = Maps.newHashMap();
+        StringBuilder sb = new StringBuilder("成功导入机构数/用户数：");
+        sb.append(userCnt);
+        sb.append(",成功导入终端数：");
+        sb.append(terminalCnt);
+        result.put(StatusConstants.SERVICE_RESULT_MESSAGE, sb.toString());
+
+        return result;
+    }
+
+
+    /**
+     * 查找所有终端ID列表
+     *
+     * @return
+     */
+    @Transactional
+    public List<String> findTerNumList() {
+        return dao.findTerNumList();
     }
 
     private void excelRowToPosterminal(PosTerminal posTerminal, Row row) {
@@ -343,4 +402,6 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         // todo return billDao.findByTerminalIdIn(idsArr);
         return null;
     }
+
+
 }

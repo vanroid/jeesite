@@ -19,4 +19,5 @@ import java.util.List;
 public interface OfficeDao extends TreeDao<Office> {
     public List<Office> findByParentId(Office office);
 
+    List<String> findCompanyNameList();
 }

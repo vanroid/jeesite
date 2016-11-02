@@ -47,7 +47,7 @@ public class TerminalServiceTest extends BaseTest {
 
     @Test
     public void testImport() {
-        clearTest();
+        //clearTest();
         terminalService.importTerminals("/home/cgz/win7vm/大创电子---商户详情表.xlsx");
     }
 

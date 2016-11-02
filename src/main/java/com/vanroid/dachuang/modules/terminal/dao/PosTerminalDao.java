@@ -22,6 +22,7 @@ public interface PosTerminalDao extends CrudDao<PosTerminal> {
 
     /**
      * 查找某机构下的所有终端id
+     *
      * @param office
      * @return
      */
@@ -29,10 +30,17 @@ public interface PosTerminalDao extends CrudDao<PosTerminal> {
 
     /**
      * 根据给定id加载实体列表
-     * @param ids
-     * @param posTerminal
+     *
+     * @param map
      * @return
      */
 
     List<PosTerminal> findListByIds(Map<String, Object> map);
+
+    /**
+     * 查找终端号列表
+     *
+     * @return
+     */
+    List<String> findTerNumList();
 }

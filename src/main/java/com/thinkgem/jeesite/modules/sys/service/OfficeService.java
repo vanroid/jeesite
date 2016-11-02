@@ -61,4 +61,9 @@ public class OfficeService extends TreeService<OfficeDao, Office> {
     public List<Office> findByParentId(Office parent) {
         return dao.findByParentId(parent);
     }
+
+    @Transactional
+    public List<String> findNameList() {
+        return dao.findCompanyNameList();
+    }
 }

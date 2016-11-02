@@ -24,4 +24,9 @@ public class StatusConstants {
      * Terminal相关常量
      */
     public static final String TERMINAL_DEFAULT_REMARKS = "test";
+
+    /**
+     * Servicr 相关常量
+     */
+    public static final String SERVICE_RESULT_MESSAGE = "message";
 }

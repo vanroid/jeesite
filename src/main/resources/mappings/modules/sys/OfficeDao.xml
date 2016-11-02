@@ -181,5 +181,9 @@
 					<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
 					<if test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</if>
 	</update>
+
+	<select id="findCompanyNameList" resultType="String">
+		SELECT name FROM sys_office WHERE type = '1';
+	</select>
 	
 </mapper>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao">
-    
+
 	<sql id="posTerminalColumns">
 		a.id AS "id",
 		a.import_date AS "importDate",
@@ -39,21 +39,21 @@
 		a.terminal_desc AS "terminalDesc",
 		u4.name AS "user.name"
 	</sql>
-	
+
 	<sql id="posTerminalJoins">
 		LEFT JOIN sys_user u4 ON u4.id = a.user_id
 	</sql>
-    
+
 	<select id="get" resultType="PosTerminal">
-		SELECT 
+		SELECT
 			<include refid="posTerminalColumns"/>
 		FROM ter_pos_terminal a
 		<include refid="posTerminalJoins"/>
 		WHERE a.id = #{id}
 	</select>
-	
+
 	<select id="findList" resultType="PosTerminal">
-		SELECT 
+		SELECT
 			<include refid="posTerminalColumns"/>
 		FROM ter_pos_terminal a
 		<include refid="posTerminalJoins"/>
@@ -105,15 +105,15 @@
 		))
 	</select>
 
-	
+
 	<select id="findAllList" resultType="PosTerminal">
-		SELECT 
+		SELECT
 			<include refid="posTerminalColumns"/>
 		FROM ter_pos_terminal a
 		<include refid="posTerminalJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
-		</where>		
+		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -123,7 +123,7 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
 	<insert id="insert">
 		INSERT INTO ter_pos_terminal(
 			id,
@@ -197,7 +197,7 @@
 			#{terminalDesc}
 		)
 	</insert>
-	
+
 	<update id="update">
 		UPDATE ter_pos_terminal SET 	
 			import_date = #{importDate},
@@ -232,11 +232,15 @@
 			terminal_desc = #{terminalDesc}
 		WHERE id = #{id}
 	</update>
-	
+
 	<update id="delete">
 		UPDATE ter_pos_terminal SET 
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
-	
+
+	<select id="findTerNumList" resultType="String">
+		SELECT DISTINCT termial_num FROM ter_pos_terminal WHERE del_flag = '0'
+	</select>
+
 </mapper>

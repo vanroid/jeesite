@@ -7,13 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.vanroid.dachuang.common.DaChuangUtils;
+import com.vanroid.dachuang.common.StatusConstants;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thinkgem.jeesite.common.config.Global;
@@ -22,6 +26,8 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
 import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
+
+import java.util.Map;
 
 /**
  * POS终端Controller
@@ -81,6 +87,26 @@ public class PosTerminalController extends BaseController {
     public String delete(PosTerminal posTerminal, RedirectAttributes redirectAttributes) {
         posTerminalService.delete(posTerminal);
         addMessage(redirectAttributes, "删除POS终端成功");
+        return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
+    }
+
+    @RequiresPermissions("terminal:posTerminal:edit")
+    @RequestMapping(value = "import", method = RequestMethod.GET)
+    public String importTerminalsAndUsersPage(RedirectAttributes redirectAttributes) {
+        return "modules/terminal/importTerminals";
+    }
+
+    @RequiresPermissions("terminal:posTerminal:edit")
+    @RequestMapping(value = "import", method = RequestMethod.POST)
+    public String importTerminalsAndUsers(MultipartFile file, RedirectAttributes redirectAttributes) {
+        logger.debug("文件成功上传：{}", file.getName());
+        Map<String, Object> result = posTerminalService.importTerminals(file);
+        if (result == null) { //插入失败
+            addMessage(redirectAttributes, "导入出错，请联系系统管理员");
+        } else {
+            addMessage(redirectAttributes, result.get(StatusConstants.SERVICE_RESULT_MESSAGE).toString());
+        }
+
         return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
     }
 
