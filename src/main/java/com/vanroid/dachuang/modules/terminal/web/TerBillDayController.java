@@ -103,7 +103,7 @@ public class TerBillDayController extends BaseController {
 			addMessage(redirectAttributes, result.get(StatusConstants.SERVICE_RESULT_MESSAGE).toString());
 		}
 
-		return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
+		return "redirect:" + Global.getAdminPath() + "/terminal/terBillDay/?repage";
 	}
 
 }

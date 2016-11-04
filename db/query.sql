@@ -22,3 +22,28 @@ where s.parent_ids like
 user_tb
 on pos_tb.user_id = user_tb.uid
 
+
+-- 查出商户插入商户表
+select DISTINCT
+  merchant_num,
+  wechat_url,
+  business_license,
+  merchant_name,
+  merchant_address,
+  merchant_legal_person,
+  booking_person,
+  telphone,
+  debit_rate,
+  credit_rate,
+  foreign_rate,
+  id_card,
+  bank_card,
+  bank_card_account_bank,
+	user_id
+from ter_pos_terminal
+
+
+where merchant_num in(
+  select merchant_num from ter_pos_terminal
+  group by merchant_num
+)

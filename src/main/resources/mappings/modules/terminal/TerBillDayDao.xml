@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vanroid.dachuang.modules.terminal.dao.TerBillDayDao">
-    
+
 	<sql id="terBillDayColumns">
 		a.id AS "id",
 		a.clear_date AS "clearDate",
@@ -24,20 +24,20 @@
 		a.remarks AS "remarks",
 		a.del_flag AS "delFlag"
 	</sql>
-	
+
 	<sql id="terBillDayJoins">
 	</sql>
-    
+
 	<select id="get" resultType="TerBillDay">
-		SELECT 
+		SELECT
 			<include refid="terBillDayColumns"/>
 		FROM ter_bill_day a
 		<include refid="terBillDayJoins"/>
 		WHERE a.id = #{id}
 	</select>
-	
+
 	<select id="findList" resultType="TerBillDay">
-		SELECT 
+		SELECT
 			<include refid="terBillDayColumns"/>
 		FROM ter_bill_day a
 		<include refid="terBillDayJoins"/>
@@ -53,7 +53,7 @@
 				AND a.merchant_num = #{merchantNum}
 			</if>
 			<if test="merchantName != null and merchantName != ''">
-				AND a.merchant_name LIKE 
+				AND a.merchant_name LIKE
 					<if test="dbName == 'oracle'">'%'||#{merchantName}||'%'</if>
 					<if test="dbName == 'mssql'">'%'+#{merchantName}+'%'</if>
 					<if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
@@ -68,15 +68,15 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
 	<select id="findAllList" resultType="TerBillDay">
-		SELECT 
+		SELECT
 			<include refid="terBillDayColumns"/>
 		FROM ter_bill_day a
 		<include refid="terBillDayJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
-		</where>		
+		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -86,7 +86,7 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
 	<insert id="insert">
 		INSERT INTO ter_bill_day(
 			id,
@@ -132,7 +132,7 @@
 			#{delFlag}
 		)
 	</insert>
-	
+
 	<update id="update">
 		UPDATE ter_bill_day SET 	
 			clear_date = #{clearDate},
@@ -153,7 +153,7 @@
 			remarks = #{remarks}
 		WHERE id = #{id}
 	</update>
-	
+
 	<update id="delete">
 		UPDATE ter_bill_day SET 
 			del_flag = #{DEL_FLAG_DELETE}
@@ -258,4 +258,8 @@
 		</choose>
 		limit ${bill.page.pageNo-1},${bill.page.pageSize}
 	</select>
+
+	<delete id="deleteByClearDate" parameterType="Date">
+		delete from ter_bill_day where clear_date = #{clearDate}
+	</delete>
 </mapper>

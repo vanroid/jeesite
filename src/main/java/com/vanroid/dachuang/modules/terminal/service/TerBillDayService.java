@@ -4,6 +4,7 @@
 package com.vanroid.dachuang.modules.terminal.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.vanroid.dachuang.modules.terminal.entity.TerBillDay;
 import com.vanroid.dachuang.modules.terminal.dao.TerBillDayDao;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 消费日流水Service
@@ -92,60 +94,92 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
      * 通过excel导入帐单信息
      */
     @Transactional(readOnly = false)
-    public int importBillDays(String fileName) {
+    public Map<String, Object> importBillDays(String fileName) {
+        // 第二个参数已无作用
+        try {
+            ImportExcel importExcel = new ImportExcel(fileName, 0);
+            return importBillDays(importExcel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Transactional(readOnly = false)
+    public Map<String, Object> importBillDays(ImportExcel importExcel) {
+
         logger.debug("开始导入帐单");
         long start = System.currentTimeMillis();
 
         int billCnt = 0;
 
-        try {
-            // 第二个参数已无作用
-            ImportExcel importExcel = new ImportExcel(fileName, 0);
-            int rows = importExcel.getLastDataRowNum();
+        int rows = importExcel.getLastDataRowNum();
 
-            List<TerBillDay> terBillDays = Lists.newArrayList();
-            // 操作用户
-            User curUser = UserUtils.getUser();
+        List<TerBillDay> terBillDays = Lists.newArrayList();
 
-            logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
-            for (int i = 1; i < rows; i++) {
-                Row row = importExcel.getRow(i);
+        // 获取流水日期
+        Date billDay = DateUtils.parseDate(ExcelUtils.getStringCellValue(importExcel.getRow(1), 0));
+        if (billDay != null) {
+            // 删除数据库中相同的日期
+            int efRows = deleteByClearDate(billDay);
+            logger.debug("已删除[{}]记录条数[{}]", DateUtils.getDate(billDay), efRows);
+        }
 
-                // 没有[商户号][终端号]的视为无效记录,停止往下执行
-                if (ExcelUtils.cellIsBank(row.getCell(0)) || ExcelUtils.cellIsBank(row.getCell(8)) || ExcelUtils.cellIsBank(row.getCell(9))) {
-                    logger.debug("导入信息时发现必需字段缺失，行数：{}", i);
-                    break;
-                }
+        // 操作用户
+        User curUser = UserUtils.getUser();
 
-                TerBillDay terBillDay = new TerBillDay();
-                // 为字段赋值
-                try {
-                    excelRowToBillDay(terBillDay, row, curUser);
-                    terBillDay.preInsert();
-                    terBillDay.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
-                } catch (Exception e) {
-                    logger.error("字段中存在错误值，行数：{}", i);
-                    throw new RuntimeException(e);
-                }
-                terBillDays.add(terBillDay);
+        logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
+        for (int i = 1; i < rows; i++) {
+            Row row = importExcel.getRow(i);
+
+            // 没有[商户号][终端号]的视为无效记录,停止往下执行
+            if (ExcelUtils.cellIsBank(row.getCell(0)) || ExcelUtils.cellIsBank(row.getCell(8)) || ExcelUtils.cellIsBank(row.getCell(9))) {
+                logger.debug("导入信息时发现必需字段缺失，行数：{}", i);
+                break;
             }
 
-            logger.debug("检测到记录数量：{}", terBillDays.size());
+            TerBillDay terBillDay = new TerBillDay();
+            // 为字段赋值
+            try {
+                excelRowToBillDay(terBillDay, row, curUser);
+                terBillDay.preInsert();
+                terBillDay.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
+            } catch (Exception e) {
+                logger.error("字段中存在错误值，行数：{}", i);
+                throw new RuntimeException(e);
+            }
+            terBillDays.add(terBillDay);
+        }
 
-            // batchinsert
-            billCnt = dao.batchInsert(terBillDays);
+        logger.debug("检测到记录数量：{}", terBillDays.size());
+
+        // batchinsert
+        billCnt = dao.batchInsert(terBillDays);
 
 
-            logger.debug("成功导入帐单记录数：" + billCnt);
-            logger.debug("耗时：{}", (System.currentTimeMillis() - start));
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-            logger.error("导入帐单出错:{}", e);
-        } catch (IOException e) {
-            e.printStackTrace();
+        logger.debug("成功导入帐单记录数：" + billCnt);
+        logger.debug("耗时：{}", (System.currentTimeMillis() - start));
+
+        Map<String, Object> result = Maps.newHashMap();
+
+        result.put(StatusConstants.SERVICE_RESULT_MESSAGE, "成功导入帐单记录数：" + billCnt);
+        return result;
+    }
+
+    @Transactional(readOnly = false)
+    private int deleteByClearDate(Date clearDate) {
+        return dao.deleteByClearDate(clearDate);
+    }
+
+    @Transactional(readOnly = false)
+    public Map<String, Object> importBillDays(MultipartFile file) {
+        try {
+            ImportExcel importExcel = new ImportExcel(file, 0, 0);
+            return importBillDays(importExcel);
+        } catch (Exception e) {
             logger.error("导入帐单出错:{}", e);
         }
-        return billCnt;
+        return null;
     }
 
     private void excelRowToBillDay(TerBillDay terBillDay, Row row, User curUser) {
@@ -179,4 +213,6 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
         terBillDay.setCreditFee(ExcelUtils.getStringCellValue(row, 12));
 
     }
+
+
 }

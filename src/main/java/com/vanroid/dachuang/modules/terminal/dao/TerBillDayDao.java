@@ -7,6 +7,7 @@ import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.terminal.entity.TerBillDay;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,4 +32,12 @@ public interface TerBillDayDao extends CrudDao<TerBillDay> {
      */
 
     int countByTerIds(List<String> terIds);
+
+    /**
+     * 通过清算日期删除所有记录
+     *
+     * @param clearDate
+     * @return
+     */
+    int deleteByClearDate(Date clearDate);
 }

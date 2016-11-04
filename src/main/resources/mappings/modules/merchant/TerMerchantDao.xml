@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao">
+    
+	<sql id="terMerchantColumns">
+		a.id AS "id",
+		a.merchant_num AS "merchantNum",
+		a.wechat_url AS "wechatUrl",
+		a.business_license AS "businessLicense",
+		a.merchant_name AS "merchantName",
+		a.merchant_address AS "merchantAddress",
+		a.merchant_legal_person AS "merchantLegalPerson",
+		a.booking_person AS "bookingPerson",
+		a.telphone AS "telphone",
+		a.debit_rate AS "debitRate",
+		a.credit_rate AS "creditRate",
+		a.foreign_rate AS "foreignRate",
+		a.id_card AS "idCard",
+		a.bank_card AS "bankCard",
+		a.bank_card_account_bank AS "bankCardAccountBank",
+		a.user_id AS "user.id",
+		a.merchat_desc AS "merchatDesc",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u16.name AS "user.name"
+	</sql>
+	
+	<sql id="terMerchantJoins">
+		LEFT JOIN sys_user u16 ON u16.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="TerMerchant">
+		SELECT 
+			<include refid="terMerchantColumns"/>
+		FROM ter_merchant a
+		<include refid="terMerchantJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TerMerchant">
+		SELECT 
+			<include refid="terMerchantColumns"/>
+		FROM ter_merchant a
+		<include refid="terMerchantJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="merchantNum != null and merchantNum != ''">
+				AND a.merchant_num = #{merchantNum}
+			</if>
+			<if test="businessLicense != null and businessLicense != ''">
+				AND a.business_license = #{businessLicense}
+			</if>
+			<if test="merchantName != null and merchantName != ''">
+				AND a.merchant_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{merchantName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{merchantName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
+			</if>
+			<if test="merchantLegalPerson != null and merchantLegalPerson != ''">
+				AND a.merchant_legal_person LIKE 
+					<if test="dbName == 'oracle'">'%'||#{merchantLegalPerson}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{merchantLegalPerson}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{merchantLegalPerson},'%')</if>
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{user.id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{user.id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{user.id},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TerMerchant">
+		SELECT 
+			<include refid="terMerchantColumns"/>
+		FROM ter_merchant a
+		<include refid="terMerchantJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ter_merchant(
+			id,
+			merchant_num,
+			wechat_url,
+			business_license,
+			merchant_name,
+			merchant_address,
+			merchant_legal_person,
+			booking_person,
+			telphone,
+			debit_rate,
+			credit_rate,
+			foreign_rate,
+			id_card,
+			bank_card,
+			bank_card_account_bank,
+			user_id,
+			merchat_desc,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{merchantNum},
+			#{wechatUrl},
+			#{businessLicense},
+			#{merchantName},
+			#{merchantAddress},
+			#{merchantLegalPerson},
+			#{bookingPerson},
+			#{telphone},
+			#{debitRate},
+			#{creditRate},
+			#{foreignRate},
+			#{idCard},
+			#{bankCard},
+			#{bankCardAccountBank},
+			#{user.id},
+			#{merchatDesc},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ter_merchant SET 	
+			merchant_num = #{merchantNum},
+			wechat_url = #{wechatUrl},
+			business_license = #{businessLicense},
+			merchant_name = #{merchantName},
+			merchant_address = #{merchantAddress},
+			merchant_legal_person = #{merchantLegalPerson},
+			booking_person = #{bookingPerson},
+			telphone = #{telphone},
+			debit_rate = #{debitRate},
+			credit_rate = #{creditRate},
+			foreign_rate = #{foreignRate},
+			id_card = #{idCard},
+			bank_card = #{bankCard},
+			bank_card_account_bank = #{bankCardAccountBank},
+			user_id = #{user.id},
+			merchat_desc = #{merchatDesc},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ter_merchant SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="updateMerchantFromTerminal">
+insert into ter_merchant(
+id,
+merchant_num,
+wechat_url,
+business_license,
+merchant_name,
+merchant_address,
+merchant_legal_person,
+booking_person,
+telphone,
+debit_rate,
+credit_rate,
+foreign_rate,
+id_card,
+bank_card,
+bank_card_account_bank,
+user_id,
+create_by,
+create_date,
+update_by,
+update_date)
+select DISTINCT
+merchant_num as mid,
+merchant_num,
+wechat_url,
+business_license,
+merchant_name,
+merchant_address,
+merchant_legal_person,
+booking_person,
+min(telphone),
+debit_rate,
+credit_rate,
+foreign_rate,
+id_card,
+bank_card,
+bank_card_account_bank,
+user_id,
+
+max(create_by),
+max(create_date),
+max(update_by),
+max(update_date)
+from ter_pos_terminal
+where del_flag = '0'
+group by merchant_num,
+wechat_url,
+business_license,
+merchant_name,
+merchant_address,
+merchant_legal_person,
+booking_person,
+debit_rate,
+credit_rate,
+foreign_rate,
+id_card,
+bank_card,
+bank_card_account_bank,
+user_id
+	</select>
+</mapper>
