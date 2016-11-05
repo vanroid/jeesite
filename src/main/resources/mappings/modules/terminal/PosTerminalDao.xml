@@ -87,9 +87,10 @@
 				AND a.bank_card = #{terminal.bankCard}
 			</if>
 			<if test="terminal.merchantName != null and terminal.merchantName != ''">
-				AND a.merchant_name = #{terminal.merchantName}
+				AND a.merchant_name LIKE
+				concat('%',#{terminal.merchantName},'%')
 			</if>
-			AND a.id IN
+				AND a.id IN
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
 			</foreach>
@@ -104,6 +105,32 @@
 		</choose>
 		limit ${page.pageNo-1},${page.pageSize}
 	</select>
+
+	<select id="findListByIdsCount" resultType="int">
+		SELECT COUNT(*)
+		FROM ter_pos_terminal a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="terminal.merchantNum != null and terminal.merchantNum != ''">
+				AND a.merchant_num = #{terminal.merchantNum}
+			</if>
+			<if test="terminal.terminalNum != null and terminal.terminalNum != ''">
+				AND a.terminal_num = #{terminal.terminalNum}
+			</if>
+			<if test="terminal.bankCard != null and terminal.bankCard != ''">
+				AND a.bank_card = #{terminal.bankCard}
+			</if>
+			<if test="terminal.merchantName != null and terminal.merchantName != ''">
+				AND a.merchant_name LIKE
+				concat('%',#{terminal.merchantName},'%')
+			</if>
+			AND a.id IN
+			<foreach collection="list" item="id" open="(" separator="," close=")" >
+				#{id}
+			</foreach>
+		</where>
+	</select>
+
 
 	<select id="findIdsByOffice" resultType="String">
 		SELECT id

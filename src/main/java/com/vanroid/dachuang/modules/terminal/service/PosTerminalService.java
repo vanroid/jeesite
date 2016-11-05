@@ -94,8 +94,8 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         map.put("list", ids);
         map.put("page", page);
         map.put("DEL_FLAG_NORMAL", 0);
-        map.put("terminal",posTerminal);
-        page.setCount(ids.size());
+        map.put("terminal", posTerminal);
+        page.setCount(dao.findListByIdsCount(map));
         page.setList(dao.findListByIds(map));
 
         return page;

@@ -38,6 +38,14 @@ public interface PosTerminalDao extends CrudDao<PosTerminal> {
     List<PosTerminal> findListByIds(Map<String, Object> map);
 
     /**
+     * 根据给定id加载实体列表,获取结果数量
+     *
+     * @param map
+     * @return
+     */
+    int findListByIdsCount(Map<String, Object> map);
+
+    /**
      * 查找终端号列表
      *
      * @return
