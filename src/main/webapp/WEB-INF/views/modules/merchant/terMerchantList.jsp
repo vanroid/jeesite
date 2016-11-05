@@ -37,7 +37,7 @@
 			<li><label>法人：</label>
 				<form:input path="merchantLegalPerson" htmlEscape="false" maxlength="10" class="input-medium"/>
 			</li>
-			<li><label>所属用户,重要字段：</label>
+			<li><label>所属用户：</label>
 				<sys:treeselect id="user" name="user.id" value="${terMerchant.user.id}" labelName="user.name" labelValue="${terMerchant.user.name}"
 					title="用户" url="/sys/office/treeData?type=3" cssClass="input-small" allowClear="true" notAllowSelectParent="true"/>
 			</li>
@@ -63,7 +63,7 @@
 				<th>身份证号</th>
 				<th>银行卡号</th>
 				<th>银行卡开户行</th>
-				<th>所属用户,重要字段</th>
+				<th>所属用户</th>
 				<th>详情</th>
 				<shiro:hasPermission name="merchant:terMerchant:edit"><th>操作</th></shiro:hasPermission>
 			</tr>
