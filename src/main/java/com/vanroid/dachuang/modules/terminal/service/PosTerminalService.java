@@ -89,11 +89,12 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     public Page<PosTerminal> findPageByUser(Page<PosTerminal> page, PosTerminal posTerminal) {
 
         List<String> ids = findIdsByUser();
-        posTerminal.setPage(page);
+        //posTerminal.setPage(page);
         Map<String, Object> map = Maps.newHashMap();
         map.put("list", ids);
         map.put("page", page);
         map.put("DEL_FLAG_NORMAL", 0);
+        map.put("terminal",posTerminal);
         page.setCount(ids.size());
         page.setList(dao.findListByIds(map));
 
@@ -293,8 +294,8 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
             List<PosTerminal> terminals = userMap.get(loginName);
             for (PosTerminal posTerminal : terminals) {
 
-                if (terNums.contains(posTerminal.getTermialNum())) {
-                    logger.debug("检测到重复终端号[{}]，归属用户[{}],已跳过插入", posTerminal.getTermialNum(), loginName);
+                if (terNums.contains(posTerminal.getTerminalNum())) {
+                    logger.debug("检测到重复终端号[{}]，归属用户[{}],已跳过插入", posTerminal.getTerminalNum(), loginName);
                     continue;
                 }
 
@@ -349,7 +350,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         // 商户号
         posTerminal.setMerchantNum(ExcelUtils.getStringCellValue(row, 6));
         // 终端号
-        posTerminal.setTermialNum(ExcelUtils.getStringCellValue(row, 7));
+        posTerminal.setTerminalNum(ExcelUtils.getStringCellValue(row, 7));
         // 微信二维码
         posTerminal.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
         // 营业执照号码

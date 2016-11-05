@@ -18,7 +18,7 @@
 		a.remarks AS "remarks",
 		a.merchant_num AS "merchantNum",
 		a.del_flag AS "delFlag",
-		a.termial_num AS "termialNum",
+		a.terminal_num AS "terminalNum",
 		a.wechat_url AS "wechatUrl",
 		a.business_license AS "businessLicense",
 		a.merchant_name AS "merchantName",
@@ -77,8 +77,19 @@
 		<include refid="posTerminalJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
-			and
-			a.id IN
+			<if test="terminal.merchantNum != null and terminal.merchantNum != ''">
+				AND a.merchant_num = #{terminal.merchantNum}
+			</if>
+			<if test="terminal.terminalNum != null and terminal.terminalNum != ''">
+				AND a.terminal_num = #{terminal.terminalNum}
+			</if>
+			<if test="terminal.bankCard != null and terminal.bankCard != ''">
+				AND a.bank_card = #{terminal.bankCard}
+			</if>
+			<if test="terminal.merchantName != null and terminal.merchantName != ''">
+				AND a.merchant_name = #{terminal.merchantName}
+			</if>
+			AND a.id IN
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
 			</foreach>
@@ -88,7 +99,7 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
-				ORDER BY a.update_date DESC, a.termial_num
+				ORDER BY a.update_date DESC, a.terminal_num
 			</otherwise>
 		</choose>
 		limit ${page.pageNo-1},${page.pageSize}
@@ -141,7 +152,7 @@
 			remarks,
 			merchant_num,
 			del_flag,
-			termial_num,
+			terminal_num,
 			wechat_url,
 			business_license,
 			merchant_name,
@@ -176,7 +187,7 @@
 			#{remarks},
 			#{merchantNum},
 			#{delFlag},
-			#{termialNum},
+			#{terminalNum},
 			#{wechatUrl},
 			#{businessLicense},
 			#{merchantName},
@@ -211,7 +222,7 @@
 			device_type = #{deviceType},
 			remarks = #{remarks},
 			merchant_num = #{merchantNum},
-			termial_num = #{termialNum},
+			terminal_num = #{terminalNum},
 			wechat_url = #{wechatUrl},
 			business_license = #{businessLicense},
 			merchant_name = #{merchantName},
@@ -240,7 +251,7 @@
 	</update>
 
 	<select id="findTerNumList" resultType="String">
-		SELECT DISTINCT termial_num FROM ter_pos_terminal WHERE del_flag = '0'
+		SELECT DISTINCT terminal_num FROM ter_pos_terminal WHERE del_flag = '0'
 	</select>
 
 </mapper>

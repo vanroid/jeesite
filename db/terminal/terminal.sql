@@ -21,7 +21,7 @@ CREATE TABLE ter_pos_terminal
 	device_num VARCHAR(25) COMMENT '机身号',
 	device_type VARCHAR(20) COMMENT '机子类型',
 	merchant_num VARCHAR(20) NOT NULL COMMENT '商户号,重要字段',
-	termial_num VARCHAR(20) NOT NULL COMMENT '终端号,重要字段',
+	terminal_num VARCHAR(20) NOT NULL COMMENT '终端号,重要字段',
   wechat_url VARCHAR(512) COMMENT '微信二维码',
   business_license VARCHAR(512) COMMENT '营业执照',
   merchant_name VARCHAR(100) COMMENT '商户名称',

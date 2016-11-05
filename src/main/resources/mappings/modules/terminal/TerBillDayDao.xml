@@ -212,7 +212,7 @@
 	<select id="countByTerIds" resultType="int">
 		select count(1) from ter_pos_terminal a
         	inner join ter_bill_day b
-            on a.termial_num = b.terminal_num
+            on a.terminal_num = b.terminal_num
             where a.id in
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
@@ -224,7 +224,7 @@
 		<include refid="terBillDayColumns"/>
 		FROM ter_bill_day a
 		INNER JOIN ter_pos_terminal b
-		ON a.terminal_num = b.termial_num
+		ON a.terminal_num = b.terminal_num
 		<include refid="terBillDayJoins"/>
 		<where>
 			a.del_flag = #{bill.DEL_FLAG_NORMAL}

@@ -25,6 +25,18 @@
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
+			<li><label>终端号：</label>
+				<form:input path="terminalNum" htmlEscape="false" maxlength="20" class="input-medium"/>
+			</li>
+			<li><label>商户编号：</label>
+				<form:input path="merchantNum" htmlEscape="false" maxlength="20" class="input-medium"/>
+			</li>
+			<li><label>商户名称：</label>
+				<form:input path="merchantName" htmlEscape="false" maxlength="100" class="input-medium"/>
+			</li>
+			<li><label>银行卡号：</label>
+				<form:input path="bankCard" htmlEscape="false" maxlength="100" class="input-medium"/>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<li class="clearfix"></li>
 		</ul>
@@ -67,7 +79,7 @@
 		<tbody>
 		<c:forEach items="${page.list}" var="posTerminal">
 			<tr>
-				<td><a href="${ctx}/terminal/posTerminal/form?id=${posTerminal.id}">${posTerminal.termialNum}</a></td>
+				<td><a href="${ctx}/terminal/posTerminal/form?id=${posTerminal.id}">${posTerminal.terminalNum}</a></td>
 				<td><fmt:formatDate value="${posTerminal.importDate}" pattern="yyyy-MM-dd"/></td>
 				<td><fmt:formatDate value="${posTerminal.downDate}" pattern="yyyy-MM-dd"/></td>
 				<td>${posTerminal.user.name}</td>
