@@ -249,7 +249,7 @@
 			</foreach>
 		</where>
 		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+			<when test="bill.page !=null and bill.page.orderBy != null and bill.page.orderBy != ''">
 				ORDER BY ${bill.page.orderBy}
 			</when>
 			<otherwise>

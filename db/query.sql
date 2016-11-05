@@ -47,3 +47,32 @@ where merchant_num in(
   select merchant_num from ter_pos_terminal
   group by merchant_num
 )
+
+
+--findListByTerIds 查找商户
+select DISTINCT
+  merchant_num,
+  wechat_url,
+  business_license,
+  merchant_name,
+  merchant_address,
+  merchant_legal_person,
+  booking_person,
+  telphone,
+  debit_rate,
+  credit_rate,
+  foreign_rate,
+  id_card,
+  bank_card,
+  bank_card_account_bank,
+	user_id
+from ter_merchant a
+INNER JOIN ter_pos_terminal b
+ON a.merchant_num = b.merchant_num
+WHERE b.id IN (
+
+)
+
+
+
+

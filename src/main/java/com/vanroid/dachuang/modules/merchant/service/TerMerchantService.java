@@ -4,7 +4,11 @@
 package com.vanroid.dachuang.modules.merchant.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.collect.Maps;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,8 @@ import com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao;
 @Transactional(readOnly = true)
 public class TerMerchantService extends CrudService<TerMerchantDao, TerMerchant> {
 
+	@Autowired
+	private PosTerminalService posTerminalService;
 	
 	public TerMerchant get(String id) {
 		TerMerchant terMerchant = super.get(id);
@@ -47,5 +53,21 @@ public class TerMerchantService extends CrudService<TerMerchantDao, TerMerchant>
 	public void delete(TerMerchant terMerchant) {
 		super.delete(terMerchant);
 	}
-	
+
+	@Transactional
+	public Page<TerMerchant> findPageByUser(Page<TerMerchant> page, TerMerchant terMerchant) {
+		terMerchant.setPage(page);
+		// 1.查找当前用户所有的terminalId
+		List<String> terIds = posTerminalService.findIdsByUser();
+
+		Map params = Maps.newHashMap();
+		params.put("merchant", terMerchant);
+		params.put("list", terIds);
+		params.put("dbName",terMerchant.getDbName());
+		page.setList(dao.findListByTerIds(params));
+		int rowCnt = dao.countByTerIds(params);
+		logger.debug("找到所属用户{}符合查询条件的商户记录数：{}", UserUtils.getUser().getName(), rowCnt);
+		page.setCount(rowCnt);
+		return page;
+	}
 }

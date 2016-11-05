@@ -76,6 +76,7 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
         Map params = Maps.newHashMap();
         params.put("bill", terBillDay);
         params.put("list", terIds);
+        params.put("dbName",terBillDay.getDbName());
         page.setList(dao.findListByTerIds(params));
         return page;
     }

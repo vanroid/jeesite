@@ -119,7 +119,7 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">所属用户,重要字段：</label>
+			<label class="control-label">所属用户：</label>
 			<div class="controls">
 				<sys:treeselect id="user" name="user.id" value="${terMerchant.user.id}" labelName="user.name" labelValue="${terMerchant.user.name}"
 					title="用户" url="/sys/office/treeData?type=3" cssClass="required" allowClear="true" notAllowSelectParent="true"/>

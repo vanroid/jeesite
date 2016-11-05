@@ -49,7 +49,7 @@ public class TerMerchantController extends BaseController {
 	@RequiresPermissions("merchant:terMerchant:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(TerMerchant terMerchant, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TerMerchant> page = terMerchantService.findPage(new Page<TerMerchant>(request, response), terMerchant); 
+		Page<TerMerchant> page = terMerchantService.findPageByUser(new Page<TerMerchant>(request, response), terMerchant);
 		model.addAttribute("page", page);
 		return "modules/merchant/terMerchantList";
 	}

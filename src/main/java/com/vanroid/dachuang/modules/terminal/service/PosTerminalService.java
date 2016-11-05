@@ -313,6 +313,8 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         }
         logger.debug("共导入用户数：" + userCnt);
 
+        // todo 增量导入商户
+
         Map result = Maps.newHashMap();
         StringBuilder sb = new StringBuilder("成功导入机构数/用户数：");
         sb.append(userCnt);

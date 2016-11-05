@@ -7,12 +7,25 @@ import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 商户管理DAO接口
+ *
  * @author CGZ
  * @version 2016-11-03
  */
 @MyBatisDao
 public interface TerMerchantDao extends CrudDao<TerMerchant> {
-	
+
+    /**
+     * 通过terminalID查找商户
+     *
+     * @param params
+     * @return
+     */
+    List<TerMerchant> findListByTerIds(Map params);
+
+    int countByTerIds(Map params);
 }
