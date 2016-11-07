@@ -31,6 +31,7 @@
 			<li><label>商户编号：</label>
 				<form:input path="merchantNum" htmlEscape="false" maxlength="20" class="input-medium"/>
 			</li>
+			<li class="clearfix"></li>
 			<li><label>商户名称：</label>
 				<form:input path="merchantName" htmlEscape="false" maxlength="100" class="input-medium"/>
 			</li>

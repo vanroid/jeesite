@@ -7,9 +7,9 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $("#btnExport").click(function () {
-                top.$.jBox.confirm("确认要导出用户数据吗？", "系统提示", function (v, h, f) {
+                top.$.jBox.confirm("确认要导出终端详情数据吗？", "系统提示", function (v, h, f) {
                     if (v == "ok") {
-                        $("#searchForm").attr("action", "${ctx}/sys/user/export");
+                        $("#searchForm").attr("action", "${ctx}/terminal/posTerminal/export");
                         $("#searchForm").submit();
                     }
                 }, {buttonsFocus: 1});
@@ -25,7 +25,7 @@
         function page(n, s) {
             if (n) $("#pageNo").val(n);
             if (s) $("#pageSize").val(s);
-            $("#searchForm").attr("action", "${ctx}/sys/user/list");
+            $("#searchForm").attr("action", "${ctx}/terminal/posTerminal/list");
             $("#searchForm").submit();
             return false;
         }
