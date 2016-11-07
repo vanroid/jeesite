@@ -19,6 +19,8 @@ import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.common.StatusConstants;
+import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
+import com.vanroid.dachuang.modules.merchant.service.TerMerchantService;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
 import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
@@ -49,6 +51,9 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     @Autowired
     private SystemService systemService;
 
+    @Autowired
+    private TerMerchantService terMerchantService;
+
     public PosTerminal get(String id) {
         PosTerminal posTerminal = super.get(id);
         return posTerminal;
@@ -76,6 +81,10 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
      */
     public List<String> findIdsByUser() {
         User user = UserUtils.getUser();
+        if (user.getCompany().getId().equals(Global.getDCCompanyId())) {   // 根部门可以看所有终端
+            logger.debug("总公司用户{}登录，不需要检查终端数", user.getName());
+            return Lists.newArrayList();
+        }
         return findIdsByUser(user);
     }
 
@@ -308,18 +317,24 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 this.save(posTerminal);
                 terminalCnt++;
             }
-            logger.debug("共导入终端数:" + terminalCnt);
+            logger.debug("共导入终端数:{}", terminalCnt);
 
         }
-        logger.debug("共导入用户数：" + userCnt);
+        logger.debug("共导入用户数：{}", userCnt);
 
         // todo 增量导入商户
+        int merchantCnt = terMerchantService.insertMerchantFromTerminal();
+
+        logger.debug("共导入商户数：{}", merchantCnt);
 
         Map result = Maps.newHashMap();
         StringBuilder sb = new StringBuilder("成功导入机构数/用户数：");
         sb.append(userCnt);
         sb.append(",成功导入终端数：");
         sb.append(terminalCnt);
+        sb.append(",成功导入商户数：");
+        sb.append(merchantCnt);
+
         result.put(StatusConstants.SERVICE_RESULT_MESSAGE, sb.toString());
 
         return result;

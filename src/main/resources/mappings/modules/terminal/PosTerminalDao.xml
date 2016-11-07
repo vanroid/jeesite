@@ -90,10 +90,12 @@
 				AND a.merchant_name LIKE
 				concat('%',#{terminal.merchantName},'%')
 			</if>
+			<if test="list != null and list.size != 0">
 				AND a.id IN
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
 			</foreach>
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -103,7 +105,7 @@
 				ORDER BY a.update_date DESC, a.terminal_num
 			</otherwise>
 		</choose>
-		limit ${page.pageNo-1},${page.pageSize}
+		limit ${(page.pageNo-1)*page.pageSize},${page.pageSize}
 	</select>
 
 	<select id="findListByIdsCount" resultType="int">
@@ -124,10 +126,12 @@
 				AND a.merchant_name LIKE
 				concat('%',#{terminal.merchantName},'%')
 			</if>
+			<if test="list != null and list.size != 0">
 			AND a.id IN
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
 			</foreach>
+			</if>
 		</where>
 	</select>
 

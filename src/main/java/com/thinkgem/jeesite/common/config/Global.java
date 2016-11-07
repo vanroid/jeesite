@@ -190,6 +190,10 @@ public class Global {
         return getConfig("dc.rootOfficeId");
     }
 
+    public static String getDCCompanyId() {
+        return getConfig("dc.daChuangCompanyId");
+    }
+
     public static String getRootAreaId() {
         return getConfig("dc.rootAreaId");
     }

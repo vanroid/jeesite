@@ -28,4 +28,6 @@ public interface TerMerchantDao extends CrudDao<TerMerchant> {
     List<TerMerchant> findListByTerIds(Map params);
 
     int countByTerIds(Map params);
+
+    int insertMerchantFromTerminal();
 }

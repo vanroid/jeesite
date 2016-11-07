@@ -213,10 +213,12 @@
 		select count(1) from ter_pos_terminal a
         	inner join ter_bill_day b
             on a.terminal_num = b.terminal_num
-            where a.id in
+		<if test="list != null and list.size != 0">
+			where a.id in
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
 			</foreach>
+		</if>
 	</select>
 
 	<select id="findListByTerIds" resultType="TerBillDay">
@@ -243,10 +245,12 @@
 				<if test="dbName == 'mssql'">'%'+#{bill.merchantName}+'%'</if>
 				<if test="dbName == 'mysql'">concat('%',#{bill.merchantName},'%')</if>
 			</if>
+			<if test="list != null and list.size != 0">
 			AND b.id in
 			<foreach collection="list" item="id" open="(" separator="," close=")" >
 				#{id}
 			</foreach>
+			</if>
 		</where>
 		<choose>
 			<when test="bill.page !=null and bill.page.orderBy != null and bill.page.orderBy != ''">
@@ -256,7 +260,7 @@
 				ORDER BY a.update_date DESC
 			</otherwise>
 		</choose>
-		limit ${bill.page.pageNo-1},${bill.page.pageSize}
+		limit ${(bill.page.pageNo-1)*bill.page.pageSize},${bill.page.pageSize}
 	</select>
 
 	<delete id="deleteByClearDate" parameterType="Date">
