@@ -19,6 +19,7 @@ import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.common.StatusConstants;
+import com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao;
 import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
 import com.vanroid.dachuang.modules.merchant.service.TerMerchantService;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
@@ -52,7 +53,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     private SystemService systemService;
 
     @Autowired
-    private TerMerchantService terMerchantService;
+    private TerMerchantDao terMerchantDao;
 
     public PosTerminal get(String id) {
         PosTerminal posTerminal = super.get(id);
@@ -323,7 +324,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         logger.debug("共导入用户数：{}", userCnt);
 
         // todo 增量导入商户
-        int merchantCnt = terMerchantService.insertMerchantFromTerminal();
+        int merchantCnt = terMerchantDao.insertMerchantFromTerminal();
 
         logger.debug("共导入商户数：{}", merchantCnt);
 

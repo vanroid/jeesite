@@ -30,7 +30,7 @@ import com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao;
 public class TerMerchantService extends CrudService<TerMerchantDao, TerMerchant> {
 
     @Autowired
-    private PosTerminalService posTerminalService;
+    private PosTerminalService posTerminalService ;
 
     public TerMerchant get(String id) {
         TerMerchant terMerchant = super.get(id);

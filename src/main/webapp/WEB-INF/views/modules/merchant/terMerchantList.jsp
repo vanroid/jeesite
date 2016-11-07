@@ -19,7 +19,7 @@
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/merchant/terMerchant/">商户列表</a></li>
-		<shiro:hasPermission name="merchant:terMerchant:edit"><li><a href="${ctx}/merchant/terMerchant/form">商户添加</a></li></shiro:hasPermission>
+		<shiro:hasRole name="employee"><shiro:hasPermission name="merchant:terMerchant:edit"><li><a href="${ctx}/merchant/terMerchant/form">商户添加</a></li></shiro:hasPermission></shiro:hasRole>
 	</ul>
 	<form:form id="searchForm" modelAttribute="terMerchant" action="${ctx}/merchant/terMerchant/" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
@@ -70,8 +70,7 @@
 		</thead>
 		<tbody>
 		<c:forEach items="${page.list}" var="terMerchant">
-			<tr>
-				<td><a href="${ctx}/merchant/terMerchant/form?id=${terMerchant.id}">
+				<td><a href="${ctx}/merchant/terMerchant/view?id=${terMerchant.id}">
 					${terMerchant.merchantNum}
 				</a></td>
 				<td>
@@ -119,10 +118,10 @@
 				<td>
 					${terMerchant.merchatDesc}
 				</td>
-				<shiro:hasPermission name="merchant:terMerchant:edit"><td>
+				<shiro:hasRole name="employee"><shiro:hasPermission name="merchant:terMerchant:edit"><td>
     				<a href="${ctx}/merchant/terMerchant/form?id=${terMerchant.id}">修改</a>
 					<a href="${ctx}/merchant/terMerchant/delete?id=${terMerchant.id}" onclick="return confirmx('确认要删除该商户吗？', this.href)">删除</a>
-				</td></shiro:hasPermission>
+				</td></shiro:hasPermission></shiro:hasRole>
 			</tr>
 		</c:forEach>
 		</tbody>
