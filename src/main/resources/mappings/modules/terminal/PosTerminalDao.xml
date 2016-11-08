@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao">
 
-	<sql id="posTerminalColumns">
+    <sql id="posTerminalColumns">
 		a.id AS "id",
 		a.import_date AS "importDate",
 		a.down_date AS "downDate",
@@ -40,103 +40,105 @@
 		u4.name AS "user.name"
 	</sql>
 
-	<sql id="posTerminalJoins">
+    <sql id="posTerminalJoins">
 		LEFT JOIN sys_user u4 ON u4.id = a.user_id
 	</sql>
 
-	<select id="get" resultType="PosTerminal">
-		SELECT
-			<include refid="posTerminalColumns"/>
-		FROM ter_pos_terminal a
-		<include refid="posTerminalJoins"/>
-		WHERE a.id = #{id}
-	</select>
+    <select id="get" resultType="PosTerminal">
+        SELECT
+        <include refid="posTerminalColumns"/>
+        FROM ter_pos_terminal a
+        <include refid="posTerminalJoins"/>
+        WHERE a.id = #{id}
+    </select>
 
-	<select id="findList" resultType="PosTerminal">
-		SELECT
-			<include refid="posTerminalColumns"/>
-		FROM ter_pos_terminal a
-		<include refid="posTerminalJoins"/>
-		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
-		</where>
-		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy}
-			</when>
-			<otherwise>
-				ORDER BY a.update_date DESC
-			</otherwise>
-		</choose>
-	</select>
+    <select id="findList" resultType="PosTerminal">
+        SELECT
+        <include refid="posTerminalColumns"/>
+        FROM ter_pos_terminal a
+        <include refid="posTerminalJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
 
-	<select id="findListByIds" resultType="PosTerminal">
-		SELECT
-		<include refid="posTerminalColumns"/>
-		FROM ter_pos_terminal a
-		<include refid="posTerminalJoins"/>
-		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
-			<if test="terminal.merchantNum != null and terminal.merchantNum != ''">
-				AND a.merchant_num = #{terminal.merchantNum}
-			</if>
-			<if test="terminal.terminalNum != null and terminal.terminalNum != ''">
-				AND a.terminal_num = #{terminal.terminalNum}
-			</if>
-			<if test="terminal.bankCard != null and terminal.bankCard != ''">
-				AND a.bank_card = #{terminal.bankCard}
-			</if>
-			<if test="terminal.merchantName != null and terminal.merchantName != ''">
-				AND a.merchant_name LIKE
-				concat('%',#{terminal.merchantName},'%')
-			</if>
-			<if test="list != null and list.size != 0">
-				AND a.id IN
-			<foreach collection="list" item="id" open="(" separator="," close=")" >
-				#{id}
-			</foreach>
-			</if>
-		</where>
-		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy}
-			</when>
-			<otherwise>
-				ORDER BY a.update_date DESC, a.terminal_num
-			</otherwise>
-		</choose>
-		limit ${(page.pageNo-1)*page.pageSize},${page.pageSize}
-	</select>
+    <select id="findListByIds" resultType="PosTerminal">
+        SELECT
+        <include refid="posTerminalColumns"/>
+        FROM ter_pos_terminal a
+        <include refid="posTerminalJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="terminal.merchantNum != null and terminal.merchantNum != ''">
+                AND a.merchant_num = #{terminal.merchantNum}
+            </if>
+            <if test="terminal.terminalNum != null and terminal.terminalNum != ''">
+                AND a.terminal_num = #{terminal.terminalNum}
+            </if>
+            <if test="terminal.bankCard != null and terminal.bankCard != ''">
+                AND a.bank_card = #{terminal.bankCard}
+            </if>
+            <if test="terminal.merchantName != null and terminal.merchantName != ''">
+                AND a.merchant_name LIKE
+                concat('%',#{terminal.merchantName},'%')
+            </if>
+            <if test="list != null and list.size != 0">
+                AND a.id IN
+                <foreach collection="list" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC, a.terminal_num
+            </otherwise>
+        </choose>
+        <if test="page.pageSize != -1">
+            limit ${(page.pageNo-1)*page.pageSize},${page.pageSize}
+        </if>
+    </select>
 
-	<select id="findListByIdsCount" resultType="int">
-		SELECT COUNT(*)
-		FROM ter_pos_terminal a
-		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
-			<if test="terminal.merchantNum != null and terminal.merchantNum != ''">
-				AND a.merchant_num = #{terminal.merchantNum}
-			</if>
-			<if test="terminal.terminalNum != null and terminal.terminalNum != ''">
-				AND a.terminal_num = #{terminal.terminalNum}
-			</if>
-			<if test="terminal.bankCard != null and terminal.bankCard != ''">
-				AND a.bank_card = #{terminal.bankCard}
-			</if>
-			<if test="terminal.merchantName != null and terminal.merchantName != ''">
-				AND a.merchant_name LIKE
-				concat('%',#{terminal.merchantName},'%')
-			</if>
-			<if test="list != null and list.size != 0">
-			AND a.id IN
-			<foreach collection="list" item="id" open="(" separator="," close=")" >
-				#{id}
-			</foreach>
-			</if>
-		</where>
-	</select>
+    <select id="findListByIdsCount" resultType="int">
+        SELECT COUNT(*)
+        FROM ter_pos_terminal a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="terminal.merchantNum != null and terminal.merchantNum != ''">
+                AND a.merchant_num = #{terminal.merchantNum}
+            </if>
+            <if test="terminal.terminalNum != null and terminal.terminalNum != ''">
+                AND a.terminal_num = #{terminal.terminalNum}
+            </if>
+            <if test="terminal.bankCard != null and terminal.bankCard != ''">
+                AND a.bank_card = #{terminal.bankCard}
+            </if>
+            <if test="terminal.merchantName != null and terminal.merchantName != ''">
+                AND a.merchant_name LIKE
+                concat('%',#{terminal.merchantName},'%')
+            </if>
+            <if test="list != null and list.size != 0">
+                AND a.id IN
+                <foreach collection="list" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
 
 
-	<select id="findIdsByOffice" resultType="String">
+    <select id="findIdsByOffice" resultType="String">
 		SELECT id
 		FROM ter_pos_terminal
 		where user_id in(
@@ -148,25 +150,25 @@
 	</select>
 
 
-	<select id="findAllList" resultType="PosTerminal">
-		SELECT
-			<include refid="posTerminalColumns"/>
-		FROM ter_pos_terminal a
-		<include refid="posTerminalJoins"/>
-		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
-		</where>
-		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy}
-			</when>
-			<otherwise>
-				ORDER BY a.update_date DESC
-			</otherwise>
-		</choose>
-	</select>
+    <select id="findAllList" resultType="PosTerminal">
+        SELECT
+        <include refid="posTerminalColumns"/>
+        FROM ter_pos_terminal a
+        <include refid="posTerminalJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
 
-	<insert id="insert">
+    <insert id="insert">
 		INSERT INTO ter_pos_terminal(
 			id,
 			import_date,
@@ -240,7 +242,7 @@
 		)
 	</insert>
 
-	<update id="update">
+    <update id="update">
 		UPDATE ter_pos_terminal SET 	
 			import_date = #{importDate},
 			down_date = #{downDate},
@@ -275,13 +277,13 @@
 		WHERE id = #{id}
 	</update>
 
-	<update id="delete">
+    <update id="delete">
 		UPDATE ter_pos_terminal SET 
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
 
-	<select id="findTerNumList" resultType="String">
+    <select id="findTerNumList" resultType="String">
 		SELECT DISTINCT terminal_num FROM ter_pos_terminal WHERE del_flag = '0'
 	</select>
 

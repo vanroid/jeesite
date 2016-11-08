@@ -112,3 +112,41 @@ CREATE TABLE ter_bill_day
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = '终端日流水表';
 create index day_idx on ter_bill_day(clear_date);
 
+
+CREATE TABLE ter_bill_month
+(
+	id varchar(64) NOT NULL COMMENT '编号',
+
+  clear_date DATE NOT NULL COMMENT '清算日期',
+  merchant_num VARCHAR(20) NOT NULL COMMENT '商户编号',
+  terminal_num VARCHAR(20) NOT NULL COMMENT '终端号',
+  acquiring_bank VARCHAR(10) NOT NULL COMMENT '收单行',
+  acquiring_nick VARCHAR(10) NOT NULL COMMENT '收单行简称',
+  merchant_name VARCHAR(100) COMMENT '商户名称',
+  maintenance_company VARCHAR(10) COMMENT '维护公司代码',
+  maintenance_company_nick VARCHAR(10) COMMENT '维护公司简称',
+  total_times INT COMMENT '总笔数',
+  total_amount DOUBLE NOT NULL COMMENT '总金额',
+  ic_times INT COMMENT 'IC卡笔数',
+  ic_amount DOUBLE COMMENT 'IC卡金额',
+  non_online_times INT COMMENT '非接联机笔数',
+  non_online_amount  DOUBLE COMMENT '非接联机金额',
+  non_offline_times INT COMMENT '非接脱机笔数',
+  non_offline_amount DOUBLE COMMENT '非接脱机金额',
+  cloud_times INT COMMENT '云闪付笔数',
+  cloud_amount DOUBLE COMMENT '云闪付金额',
+  appl_times INT COMMENT 'Appl笔数',
+  appl_amount DOUBLE COMMENT 'Appl金额',
+  hce_times INT COMMENT 'HCE笔数',
+  hce_amount DOUBLE COMMENT 'HCE金额',
+  sams_times INT COMMENT 'Sams笔数',
+  sams_amount DOUBLE COMMENT 'Sams金额',
+
+	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = '终端月帐单表';
+create index day_idx on ter_bill_month(clear_date);
+
+
+
+
+

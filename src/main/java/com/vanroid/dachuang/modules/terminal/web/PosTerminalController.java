@@ -6,6 +6,9 @@ package com.vanroid.dachuang.modules.terminal.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.vanroid.dachuang.common.DaChuangUtils;
 import com.vanroid.dachuang.common.StatusConstants;
@@ -107,6 +110,32 @@ public class PosTerminalController extends BaseController {
             addMessage(redirectAttributes, result.get(StatusConstants.SERVICE_RESULT_MESSAGE).toString());
         }
 
+        return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
+    }
+
+    @RequiresPermissions("terminal:posTerminal:view")
+    @RequestMapping(value = "export", method = RequestMethod.POST)
+    public String exportTerminalsAndUsers(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+
+        try {
+            User user = UserUtils.getUser();
+            logger.debug("用户{}正在导出终端数据", user.getName());
+
+            String fileName = "终端数据" + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
+
+            PosTerminal posTerminal = new PosTerminal();
+            Page<PosTerminal> posTerminalPage = new Page<PosTerminal>();
+            posTerminalPage.setPageSize(-1);
+
+            Page<PosTerminal> page = posTerminalService.findPageByUser(posTerminalPage, posTerminal);
+
+            new ExportExcel("终端数据", PosTerminal.class).setDataList(page.getList()).write(response, fileName).dispose();
+            logger.debug("用户{}正在导出终端数据{}条", user.getName(), page.getList().size());
+            return null;
+        } catch (Exception e) {
+            logger.error("导出数据出错", e);
+            addMessage(redirectAttributes, "导出数据出错：{}", e.getMessage());
+        }
         return "redirect:" + Global.getAdminPath() + "/terminal/posTerminal/?repage";
     }
 
