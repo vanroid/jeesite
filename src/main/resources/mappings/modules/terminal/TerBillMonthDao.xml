@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vanroid.dachuang.modules.terminal.dao.TerBillMonthDao">
+    
+	<sql id="terBillMonthColumns">
+		a.id AS "id",
+		a.clear_date AS "clearDate",
+		a.merchant_num AS "merchantNum",
+		a.terminal_num AS "terminalNum",
+		a.acquiring_bank AS "acquiringBank",
+		a.acquiring_nick AS "acquiringNick",
+		a.merchant_name AS "merchantName",
+		a.maintenance_company AS "maintenanceCompany",
+		a.maintenance_company_nick AS "maintenanceCompanyNick",
+		a.total_times AS "totalTimes",
+		a.total_amount AS "totalAmount",
+		a.ic_times AS "icTimes",
+		a.ic_amount AS "icAmount",
+		a.non_online_times AS "nonOnlineTimes",
+		a.non_online_amount AS "nonOnlineAmount",
+		a.non_offline_times AS "nonOfflineTimes",
+		a.non_offline_amount AS "nonOfflineAmount",
+		a.cloud_times AS "cloudTimes",
+		a.cloud_amount AS "cloudAmount",
+		a.appl_times AS "applTimes",
+		a.appl_amount AS "applAmount",
+		a.hce_times AS "hceTimes",
+		a.hce_amount AS "hceAmount",
+		a.sams_times AS "samsTimes",
+		a.sams_amount AS "samsAmount"
+	</sql>
+	
+	<sql id="terBillMonthJoins">
+	</sql>
+    
+	<select id="get" resultType="TerBillMonth">
+		SELECT 
+			<include refid="terBillMonthColumns"/>
+		FROM ter_bill_month a
+		<include refid="terBillMonthJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TerBillMonth">
+		SELECT 
+			<include refid="terBillMonthColumns"/>
+		FROM ter_bill_month a
+		<include refid="terBillMonthJoins"/>
+		<where>
+			
+			<if test="clearDate != null and clearDate != ''">
+				AND a.clear_date = #{clearDate}
+			</if>
+			<if test="merchantNum != null and merchantNum != ''">
+				AND a.merchant_num = #{merchantNum}
+			</if>
+			<if test="terminalNum != null and terminalNum != ''">
+				AND a.terminal_num = #{terminalNum}
+			</if>
+			<if test="merchantName != null and merchantName != ''">
+				AND a.merchant_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{merchantName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{merchantName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
+			</if>
+			<if test="maintenanceCompany != null and maintenanceCompany != ''">
+				AND a.maintenance_company = #{maintenanceCompany}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TerBillMonth">
+		SELECT 
+			<include refid="terBillMonthColumns"/>
+		FROM ter_bill_month a
+		<include refid="terBillMonthJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ter_bill_month(
+			id,
+			clear_date,
+			merchant_num,
+			terminal_num,
+			acquiring_bank,
+			acquiring_nick,
+			merchant_name,
+			maintenance_company,
+			maintenance_company_nick,
+			total_times,
+			total_amount,
+			ic_times,
+			ic_amount,
+			non_online_times,
+			non_online_amount,
+			non_offline_times,
+			non_offline_amount,
+			cloud_times,
+			cloud_amount,
+			appl_times,
+			appl_amount,
+			hce_times,
+			hce_amount,
+			sams_times,
+			sams_amount
+		) VALUES (
+			#{id},
+			#{clearDate},
+			#{merchantNum},
+			#{terminalNum},
+			#{acquiringBank},
+			#{acquiringNick},
+			#{merchantName},
+			#{maintenanceCompany},
+			#{maintenanceCompanyNick},
+			#{totalTimes},
+			#{totalAmount},
+			#{icTimes},
+			#{icAmount},
+			#{nonOnlineTimes},
+			#{nonOnlineAmount},
+			#{nonOfflineTimes},
+			#{nonOfflineAmount},
+			#{cloudTimes},
+			#{cloudAmount},
+			#{applTimes},
+			#{applAmount},
+			#{hceTimes},
+			#{hceAmount},
+			#{samsTimes},
+			#{samsAmount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ter_bill_month SET 	
+			clear_date = #{clearDate},
+			merchant_num = #{merchantNum},
+			terminal_num = #{terminalNum},
+			acquiring_bank = #{acquiringBank},
+			acquiring_nick = #{acquiringNick},
+			merchant_name = #{merchantName},
+			maintenance_company = #{maintenanceCompany},
+			maintenance_company_nick = #{maintenanceCompanyNick},
+			total_times = #{totalTimes},
+			total_amount = #{totalAmount},
+			ic_times = #{icTimes},
+			ic_amount = #{icAmount},
+			non_online_times = #{nonOnlineTimes},
+			non_online_amount = #{nonOnlineAmount},
+			non_offline_times = #{nonOfflineTimes},
+			non_offline_amount = #{nonOfflineAmount},
+			cloud_times = #{cloudTimes},
+			cloud_amount = #{cloudAmount},
+			appl_times = #{applTimes},
+			appl_amount = #{applAmount},
+			hce_times = #{hceTimes},
+			hce_amount = #{hceAmount},
+			sams_times = #{samsTimes},
+			sams_amount = #{samsAmount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM ter_bill_month
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
