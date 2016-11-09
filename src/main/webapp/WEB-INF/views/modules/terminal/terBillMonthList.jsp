@@ -6,7 +6,7 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			
+
 		});
 		function page(n,s){
 			$("#pageNo").val(n);
@@ -14,6 +14,25 @@
 			$("#searchForm").submit();
         	return false;
         }
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$("#btnExport").click(function () {
+				top.$.jBox.confirm("确认要导出月帐单数据吗？", "系统提示", function (v, h, f) {
+					if (v == "ok") {
+						$("#searchForm").attr("action", "${ctx}/terminal/terBillMonth/export");
+						$("#searchForm").submit();
+					}
+				}, {buttonsFocus: 1});
+				top.$('.jbox-body .jbox-icon').css('top', '55px');
+			});
+			$("#btnImport").click(function () {
+				$.jBox($("#importBox").html(), {
+					title: "导入数据", buttons: {"关闭": true},
+					bottomText: "导入文件不能超过5M，仅允许导入“xls”或“xlsx”格式文件！"
+				});
+			});
+		});
 	</script>
 </head>
 <body>
@@ -28,7 +47,7 @@
 			<li><label>清算日期：</label>
 				<input name="clearDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${terBillMonth.clearDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+					onclick="WdatePicker({dateFmt:'yyyy-MM',isShowClear:false});"/>
 			</li>
 			<li><label>商户编号：</label>
 				<form:input path="merchantNum" htmlEscape="false" maxlength="20" class="input-medium"/>
@@ -36,13 +55,17 @@
 			<li><label>终端号：</label>
 				<form:input path="terminalNum" htmlEscape="false" maxlength="20" class="input-medium"/>
 			</li>
+			<li class="clearfix"></li>
 			<li><label>商户名称：</label>
 				<form:input path="merchantName" htmlEscape="false" maxlength="100" class="input-medium"/>
 			</li>
-			<li><label>维护公司代码：</label>
+			<li><label>维护公司：</label>
 				<form:input path="maintenanceCompany" htmlEscape="false" maxlength="10" class="input-medium"/>
 			</li>
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+				<shiro:hasRole name="employee">
+				<input id="btnExport" class="btn btn-primary" type="button" value="导出"/>
+				<input id="btnImport" class="btn btn-primary" type="button" value="导入"/></shiro:hasRole></li>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
@@ -64,12 +87,12 @@
 				<th>IC卡金额</th>
 				<th>非接联机笔数</th>
 				<th>非接联机金额</th>
+				<th>Appl金额</th>
 				<th>非接脱机笔数</th>
 				<th>非接脱机金额</th>
 				<th>云闪付笔数</th>
 				<th>云闪付金额</th>
 				<th>Appl笔数</th>
-				<th>Appl金额</th>
 				<th>HCE笔数</th>
 				<th>HCE金额</th>
 				<th>Sams笔数</th>
@@ -81,7 +104,7 @@
 		<c:forEach items="${page.list}" var="terBillMonth">
 			<tr>
 				<td><a href="${ctx}/terminal/terBillMonth/form?id=${terBillMonth.id}">
-					<fmt:formatDate value="${terBillMonth.clearDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					<fmt:formatDate value="${terBillMonth.clearDate}" pattern="yyyyMM"/>
 				</a></td>
 				<td>
 					${terBillMonth.merchantNum}
@@ -160,6 +183,15 @@
 		</c:forEach>
 		</tbody>
 	</table>
+	<!--import box-->
+	<div id="importBox" class="hide">
+		<form id="importForm" action="${ctx}/terminal/terBillMonth/import" method="post" enctype="multipart/form-data"
+			  class="form-search" style="padding-left:20px;text-align:center;" onsubmit="loading('正在导入，请稍等...');"><br/>
+			<input id="uploadFile" name="file" type="file" style="width:330px"/><br/><br/>　　
+			<input id="btnImportSubmit" class="btn btn-primary" type="submit" value="   导    入   "/>
+			<a href="${ctx}/terminal/terBillMonth/import/template">下载模板</a>
+		</form>
+	</div>
 	<div class="pagination">${page}</div>
 </body>
 </html>

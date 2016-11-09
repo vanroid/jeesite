@@ -12,7 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thinkgem.jeesite.common.config.Global;
@@ -24,6 +26,7 @@ import com.vanroid.dachuang.modules.terminal.service.TerBillMonthService;
 
 /**
  * 月帐单Controller
+ *
  * @author CGZ
  * @version 2016-11-08
  */
@@ -31,53 +34,66 @@ import com.vanroid.dachuang.modules.terminal.service.TerBillMonthService;
 @RequestMapping(value = "${adminPath}/terminal/terBillMonth")
 public class TerBillMonthController extends BaseController {
 
-	@Autowired
-	private TerBillMonthService terBillMonthService;
-	
-	@ModelAttribute
-	public TerBillMonth get(@RequestParam(required=false) String id) {
-		TerBillMonth entity = null;
-		if (StringUtils.isNotBlank(id)){
-			entity = terBillMonthService.get(id);
-		}
-		if (entity == null){
-			entity = new TerBillMonth();
-		}
-		return entity;
-	}
-	
-	@RequiresPermissions("terminal:terBillMonth:view")
-	@RequestMapping(value = {"list", ""})
-	public String list(TerBillMonth terBillMonth, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TerBillMonth> page = terBillMonthService.findPage(new Page<TerBillMonth>(request, response), terBillMonth); 
-		model.addAttribute("page", page);
-		return "modules/terminal/terBillMonthList";
-	}
+    @Autowired
+    private TerBillMonthService terBillMonthService;
 
-	@RequiresPermissions("terminal:terBillMonth:view")
-	@RequestMapping(value = "form")
-	public String form(TerBillMonth terBillMonth, Model model) {
-		model.addAttribute("terBillMonth", terBillMonth);
-		return "modules/terminal/terBillMonthForm";
-	}
+    @ModelAttribute
+    public TerBillMonth get(@RequestParam(required = false) String id) {
+        TerBillMonth entity = null;
+        if (StringUtils.isNotBlank(id)) {
+            entity = terBillMonthService.get(id);
+        }
+        if (entity == null) {
+            entity = new TerBillMonth();
+        }
+        return entity;
+    }
 
-	@RequiresPermissions("terminal:terBillMonth:edit")
-	@RequestMapping(value = "save")
-	public String save(TerBillMonth terBillMonth, Model model, RedirectAttributes redirectAttributes) {
-		if (!beanValidator(model, terBillMonth)){
-			return form(terBillMonth, model);
-		}
-		terBillMonthService.save(terBillMonth);
-		addMessage(redirectAttributes, "保存月帐单成功");
-		return "redirect:"+Global.getAdminPath()+"/terminal/terBillMonth/?repage";
-	}
-	
-	@RequiresPermissions("terminal:terBillMonth:edit")
-	@RequestMapping(value = "delete")
-	public String delete(TerBillMonth terBillMonth, RedirectAttributes redirectAttributes) {
-		terBillMonthService.delete(terBillMonth);
-		addMessage(redirectAttributes, "删除月帐单成功");
-		return "redirect:"+Global.getAdminPath()+"/terminal/terBillMonth/?repage";
-	}
+    @RequiresPermissions("terminal:terBillMonth:view")
+    @RequestMapping(value = {"list", ""})
+    public String list(TerBillMonth terBillMonth, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Page<TerBillMonth> page = terBillMonthService.findPage(new Page<TerBillMonth>(request, response), terBillMonth);
+        model.addAttribute("page", page);
+        return "modules/terminal/terBillMonthList";
+    }
+
+    @RequiresPermissions("terminal:terBillMonth:view")
+    @RequestMapping(value = "form")
+    public String form(TerBillMonth terBillMonth, Model model) {
+        model.addAttribute("terBillMonth", terBillMonth);
+        return "modules/terminal/terBillMonthForm";
+    }
+
+    @RequiresPermissions("terminal:terBillMonth:edit")
+    @RequestMapping(value = "save")
+    public String save(TerBillMonth terBillMonth, Model model, RedirectAttributes redirectAttributes) {
+        if (!beanValidator(model, terBillMonth)) {
+            return form(terBillMonth, model);
+        }
+        terBillMonthService.save(terBillMonth);
+        addMessage(redirectAttributes, "保存月帐单成功");
+        return "redirect:" + Global.getAdminPath() + "/terminal/terBillMonth/?repage";
+    }
+
+    @RequiresPermissions("terminal:terBillMonth:edit")
+    @RequestMapping(value = "delete")
+    public String delete(TerBillMonth terBillMonth, RedirectAttributes redirectAttributes) {
+        terBillMonthService.delete(terBillMonth);
+        addMessage(redirectAttributes, "删除月帐单成功");
+        return "redirect:" + Global.getAdminPath() + "/terminal/terBillMonth/?repage";
+    }
+
+    @RequiresPermissions("terminal:terBillMonth:edit")
+    @RequestMapping(value = "import", method = RequestMethod.POST)
+    public String importBillMonth(MultipartFile file, RedirectAttributes redirectAttributes) {
+        try {
+            terBillMonthService.importBillMonths(file);
+        } catch (Exception e) {
+            logger.error("导入帐单出错", e);
+            addMessage(redirectAttributes, "导入帐单出错", e.getMessage());
+        }
+        return "redirect:" + Global.getAdminPath() + "/terminal/terBillMonth/?repage";
+    }
+
 
 }

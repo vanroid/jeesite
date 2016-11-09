@@ -7,12 +7,25 @@ import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * 月帐单DAO接口
+ *
  * @author CGZ
  * @version 2016-11-08
  */
 @MyBatisDao
 public interface TerBillMonthDao extends CrudDao<TerBillMonth> {
-	
+
+    /**
+     * 通过月份删除记录
+     *
+     * @param clrDate 格式yyyyMM
+     * @return
+     */
+    int deleteByClearDate(Date clrDate);
+
+    int batchSave(List<TerBillMonth> datas);
 }

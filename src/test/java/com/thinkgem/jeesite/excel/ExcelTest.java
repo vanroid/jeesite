@@ -1,21 +1,16 @@
 package com.thinkgem.jeesite.excel;
 
-import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.io.Files;
 import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
-import com.thinkgem.jeesite.modules.sys.service.OfficeService;
-import com.thinkgem.jeesite.modules.sys.service.SystemService;
-import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
-import com.vanroid.dachuang.modules.terminal.service.PosTerminalService;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import com.vanroid.dachuang.common.csv.ImportCSV;
+import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import sun.nio.cs.StandardCharsets;
 
-import java.io.*;
+import java.io.File;
+import java.io.Reader;
 import java.nio.charset.Charset;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,8 +36,6 @@ public class ExcelTest {
             ImportExcel importExcel = new ImportExcel("/home/cgz/win7vm/LYGZ_20160613.xls", 100);
             Cell c = importExcel.getRow(1).getCell(0);
 
-
-
             System.out.println(c.getStringCellValue());
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,8 +45,22 @@ public class ExcelTest {
 
     @Test
     public void testCsv() {
+        try {
+            Reader reader = Files.newReader(new File("/home/cgz/win7vm/终端交易统计_143_大创电子_201609.csv"), Charset.forName("GBK"));
+            List<TerBillMonth> ls = new ImportCSV(reader, 1).getDataList(TerBillMonth.class);
+            for (TerBillMonth bill : ls) {
+                System.out.println(bill.getClearDate());
+                System.out.println(bill.getTotalAmount());
+                System.out.println(bill.getMaintenanceCompanyNick());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
 
+    @Test
+    public void test(){
+    }
 }

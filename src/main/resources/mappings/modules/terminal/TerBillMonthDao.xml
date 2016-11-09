@@ -182,5 +182,68 @@
 		DELETE FROM ter_bill_month
 		WHERE id = #{id}
 	</update>
-	
+
+	<delete id="deleteByClearDate" parameterType="Date">
+		delete from ter_bill_month where clear_date = #{clearDate}
+	</delete>
+
+	<insert id="batchSave" parameterType="TerBillMonth">
+		INSERT INTO ter_bill_month(
+			id,
+			clear_date,
+			merchant_num,
+			terminal_num,
+			acquiring_bank,
+			acquiring_nick,
+			merchant_name,
+			maintenance_company,
+			maintenance_company_nick,
+			total_times,
+			total_amount,
+			ic_times,
+			ic_amount,
+			non_online_times,
+			non_online_amount,
+			non_offline_times,
+			non_offline_amount,
+			cloud_times,
+			cloud_amount,
+			appl_times,
+			appl_amount,
+			hce_times,
+			hce_amount,
+			sams_times,
+			sams_amount
+		) VALUES
+		<foreach collection="list" item="bill" separator=",">
+			(
+			#{bill.id},
+			#{bill.clearDate},
+			#{bill.merchantNum},
+			#{bill.terminalNum},
+			#{bill.acquiringBank},
+			#{bill.acquiringNick},
+			#{bill.merchantName},
+			#{bill.maintenanceCompany},
+			#{bill.maintenanceCompanyNick},
+			#{bill.totalTimes},
+			#{bill.totalAmount},
+			#{bill.icTimes},
+			#{bill.icAmount},
+			#{bill.nonOnlineTimes},
+			#{bill.nonOnlineAmount},
+			#{bill.nonOfflineTimes},
+			#{bill.nonOfflineAmount},
+			#{bill.cloudTimes},
+			#{bill.cloudAmount},
+			#{bill.applTimes},
+			#{bill.applAmount},
+			#{bill.hceTimes},
+			#{bill.hceAmount},
+			#{bill.samsTimes},
+			#{bill.samsAmount}
+			)
+		</foreach>
+
+</insert>
 </mapper>
