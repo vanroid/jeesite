@@ -119,7 +119,7 @@ public class SystemService extends BaseService implements InitializingBean {
 		List<User> list = (List<User>)CacheUtils.get(UserUtils.USER_CACHE, UserUtils.USER_CACHE_LIST_BY_OFFICE_ID_ + officeId);
 		if (list == null){
 			User user = new User();
-			user.setOffice(new Office(officeId));
+			/*user.setOffice(new Office(officeId));*/
 			list = userDao.findUserByOfficeId(user);
 			CacheUtils.put(UserUtils.USER_CACHE, UserUtils.USER_CACHE_LIST_BY_OFFICE_ID_ + officeId, list);
 		}
@@ -134,9 +134,9 @@ public class SystemService extends BaseService implements InitializingBean {
 		}else{
 			// 清除原用户机构用户缓存
 			User oldUser = userDao.get(user.getId());
-			if (oldUser.getOffice() != null && oldUser.getOffice().getId() != null){
+			/*if (oldUser.getOffice() != null && oldUser.getOffice().getId() != null){
 				CacheUtils.remove(UserUtils.USER_CACHE, UserUtils.USER_CACHE_LIST_BY_OFFICE_ID_ + oldUser.getOffice().getId());
-			}
+			}*/
 			// 更新用户数据
 			user.preUpdate();
 			userDao.update(user);

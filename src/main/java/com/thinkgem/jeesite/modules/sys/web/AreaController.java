@@ -58,9 +58,9 @@ public class AreaController extends BaseController {
 	@RequiresPermissions("sys:area:view")
 	@RequestMapping(value = "form")
 	public String form(Area area, Model model) {
-		if (area.getParent()==null||area.getParent().getId()==null){
+		/*if (area.getParent()==null||area.getParent().getId()==null){
 			area.setParent(UserUtils.getUser().getOffice().getArea());
-		}
+		}*/
 		area.setParent(areaService.get(area.getParent().getId()));
 //		// 自动获取排序号
 //		if (StringUtils.isBlank(area.getId())){

@@ -7,6 +7,7 @@ import com.ckfinder.connector.ServletContextFactory;
 import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.utils.PropertiesLoader;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.springframework.core.io.DefaultResourceLoader;
 
 import java.io.File;
@@ -186,8 +187,20 @@ public class Global {
         return projectPath;
     }
 
-    public static String getRootOfficeId() {
-        return getConfig("dc.rootOfficeId");
+    /**
+     * 代理商根机构
+     * @return
+     */
+    public static String getRootAgentOfficeId() {
+        return getConfig("dc.rootAgentOfficeId");
+    }
+
+    /**
+     * 分公司根机构
+     * @return
+     */
+    public static String getRootBranchOfficeId(){
+        return getConfig("dc.rootBranchOfficeId");
     }
 
     public static String getDCCompanyId() {
@@ -204,5 +217,9 @@ public class Global {
 
     public static String getAgentRoleId() {
         return getConfig("dc.agentRoleId");
+    }
+
+    public static String getBranchRoleId() {
+        return getConfig("dc.branchRoleId");
     }
 }

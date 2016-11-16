@@ -119,11 +119,9 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">所属用户：</label>
+			<label class="control-label">业务员：</label>
 			<div class="controls">
-				<sys:treeselect id="user" name="user.id" value="${terMerchant.user.id}" labelName="user.name" labelValue="${terMerchant.user.name}"
-					title="用户" url="/sys/office/treeData?type=3" cssClass="required" allowClear="true" notAllowSelectParent="true"/>
-				<span class="help-inline"><font color="red">*</font> </span>
+				<form:input path="salesman" htmlEscape="false" maxlength="20" class="input-xlarge "/>
 			</div>
 		</div>
 		<div class="control-group">
@@ -133,13 +131,21 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label">机构编号：</label>
+			<div class="controls">
+				<sys:treeselect id="office" name="office.id" value="${terMerchant.office.id}" labelName="office.name" labelValue="${terMerchant.office.name}"
+					title="部门" url="/sys/office/treeData?type=2" cssClass="required" allowClear="true" notAllowSelectParent="true"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">备注信息：</label>
 			<div class="controls">
 				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
 			</div>
 		</div>
 		<div class="form-actions">
-			<shiro:hasRole name="employee"><shiro:hasPermission name="merchant:terMerchant:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission></shiro:hasRole>
+			<shiro:hasPermission name="merchant:terMerchant:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>
 	</form:form>

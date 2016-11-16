@@ -93,9 +93,9 @@ public class UserController extends BaseController {
         if (user.getCompany() == null || user.getCompany().getId() == null) {
             user.setCompany(UserUtils.getUser().getCompany());
         }
-        if (user.getOffice() == null || user.getOffice().getId() == null) {
+        /*if (user.getOffice() == null || user.getOffice().getId() == null) {
             user.setOffice(UserUtils.getUser().getOffice());
-        }
+        }*/
         List<Role> roleList = systemService.findAllRole();
         // 过滤系统用户
         // DaChuangUtils.transFormRoleList(roleList);
@@ -116,12 +116,6 @@ public class UserController extends BaseController {
         }
         // 修正引用赋值问题，不知道为何，Company和Office引用的一个实例地址，修改了一个，另外一个跟着修改。
         user.setCompany(new Office(request.getParameter("company.id")));
-
-        // dc: 部门只有总部，通过company.id查到company的总部id
-        //user.setOffice(new Office(request.getParameter("office.id")));
-        List<Office> childOffices = officeService.findByParentId(user.getCompany());
-        Office zbOffice = DaChuangUtils.transformChildOffices(childOffices);
-        user.setOffice(zbOffice);
 
         // 如果新密码为空，则不更换密码
         if (StringUtils.isNotBlank(user.getNewPassword())) {

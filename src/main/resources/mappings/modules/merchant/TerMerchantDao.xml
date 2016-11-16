@@ -18,19 +18,20 @@
 		a.id_card AS "idCard",
 		a.bank_card AS "bankCard",
 		a.bank_card_account_bank AS "bankCardAccountBank",
-		a.user_id AS "user.id",
+		a.salesman AS "salesman",
 		a.merchat_desc AS "merchatDesc",
+		a.office_id AS "office.id",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
 		a.remarks AS "remarks",
 		a.del_flag AS "delFlag",
-		u16.name AS "user.name"
+		o18.name AS "office.name"
 	</sql>
 	
 	<sql id="terMerchantJoins">
-		LEFT JOIN sys_user u16 ON u16.id = a.user_id
+		LEFT JOIN sys_office o18 ON o18.id = a.office_id
 	</sql>
     
 	<select id="get" resultType="TerMerchant">
@@ -51,26 +52,17 @@
 			<if test="merchantNum != null and merchantNum != ''">
 				AND a.merchant_num = #{merchantNum}
 			</if>
-			<if test="businessLicense != null and businessLicense != ''">
-				AND a.business_license = #{businessLicense}
-			</if>
 			<if test="merchantName != null and merchantName != ''">
 				AND a.merchant_name LIKE 
 					<if test="dbName == 'oracle'">'%'||#{merchantName}||'%'</if>
 					<if test="dbName == 'mssql'">'%'+#{merchantName}+'%'</if>
 					<if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
 			</if>
-			<if test="merchantLegalPerson != null and merchantLegalPerson != ''">
-				AND a.merchant_legal_person LIKE 
-					<if test="dbName == 'oracle'">'%'||#{merchantLegalPerson}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{merchantLegalPerson}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{merchantLegalPerson},'%')</if>
+			<if test="telphone != null and telphone != ''">
+				AND a.telphone = #{telphone}
 			</if>
-			<if test="user != null and user.id != null and user.id != ''">
-				AND a.user_id LIKE 
-					<if test="dbName == 'oracle'">'%'||#{user.id}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{user.id}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{user.id},'%')</if>
+			<if test="salesman != null and salesman != ''">
+				AND a.salesman = #{salesman}
 			</if>
 		</where>
 		<choose>
@@ -118,8 +110,9 @@
 			id_card,
 			bank_card,
 			bank_card_account_bank,
-			user_id,
+			salesman,
 			merchat_desc,
+			office_id,
 			create_by,
 			create_date,
 			update_by,
@@ -142,8 +135,9 @@
 			#{idCard},
 			#{bankCard},
 			#{bankCardAccountBank},
-			#{user.id},
+			#{salesman},
 			#{merchatDesc},
+			#{office.id},
 			#{createBy.id},
 			#{createDate},
 			#{updateBy.id},
@@ -169,8 +163,9 @@
 			id_card = #{idCard},
 			bank_card = #{bankCard},
 			bank_card_account_bank = #{bankCardAccountBank},
-			user_id = #{user.id},
+			salesman = #{salesman},
 			merchat_desc = #{merchatDesc},
+			office_id = #{office.id},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks}
@@ -182,146 +177,5 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
-
-	<insert id="insertMerchantFromTerminal">
-			insert into ter_merchant(
-			id,
-			merchant_num,
-			wechat_url,
-			business_license,
-			merchant_name,
-			merchant_address,
-			merchant_legal_person,
-			booking_person,
-			telphone,
-			debit_rate,
-			credit_rate,
-			foreign_rate,
-			id_card,
-			bank_card,
-			bank_card_account_bank,
-			user_id,
-			create_by,
-			create_date,
-			update_by,
-			update_date)
-			select DISTINCT
-			a.merchant_num as mid,
-			a.merchant_num,
-			max(a.wechat_url),
-			max(a.business_license),
-			max(a.merchant_name),
-			max(a.merchant_address),
-			max(a.merchant_legal_person),
-			max(a.booking_person),
-			min(a.telphone),
-			max(a.debit_rate),
-			max(a.credit_rate),
-			max(a.foreign_rate),
-			max(a.id_card),
-			max(a.bank_card),
-			max(a.bank_card_account_bank),
-			max(a.user_id),
-
-			max(a.create_by),
-			max(a.create_date),
-			max(a.update_by),
-			max(a.update_date)
-			from ter_pos_terminal a
-			where a.del_flag = '0' and a.merchant_num not in (
-				SELECT merchant_num from ter_merchant
-			)
-			group by a.merchant_num
-	</insert>
-
-	<select id="findListByTerIds" resultType="TerMerchant">
-		SELECT DISTINCT
-		<include refid="terMerchantColumns"/>
-		FROM ter_merchant a
-		<include refid="terMerchantJoins"/>
-		<where>
-			a.del_flag = #{merchant.DEL_FLAG_NORMAL}
-			<if test="merchant.merchantNum != null and merchant.merchantNum != ''">
-				AND a.merchant_num = #{merchant.merchantNum}
-			</if>
-			<if test="merchant.businessLicense != null and merchant.businessLicense != ''">
-				AND a.business_license = #{merchant.businessLicense}
-			</if>
-			<if test="merchant.merchantName != null and merchant.merchantName != ''">
-				AND a.merchant_name LIKE
-				<if test="dbName == 'oracle'">'%'||#{merchant.merchantName}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{merchant.merchantName}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{merchant.merchantName},'%')</if>
-			</if>
-			<if test="merchant.merchantLegalPerson != null and merchant.merchantLegalPerson != ''">
-				AND a.merchant_legal_person LIKE
-				<if test="dbName == 'oracle'">'%'||#{merchant.merchantLegalPerson}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{merchant.merchantLegalPerson}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{merchant.merchantLegalPerson},'%')</if>
-			</if>
-			<if test="merchant.user != null and merchant.user.id != null and merchant.user.id != ''">
-				AND a.user_id LIKE
-				<if test="dbName == 'oracle'">'%'||#{merchant.user.id}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{merchant.user.id}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{merchant.user.id},'%')</if>
-			</if>
-			<if test="list != null and list.size !=0">
-				AND a.merchant_num IN(
-				SELECT DISTINCT merchant_num from ter_pos_terminal where id in
-					<foreach collection="list" item="id" open="(" separator="," close=")" >
-						#{id}
-					</foreach>
-				)
-			</if>
-		</where>
-		<choose>
-			<when test="merchant.page !=null and merchant.page.orderBy != null and merchant.page.orderBy != ''">
-				ORDER BY ${merchant.page.orderBy}
-			</when>
-			<otherwise>
-				ORDER BY a.update_date DESC
-			</otherwise>
-		</choose>
-		limit ${(merchant.page.pageNo-1)*(merchant.page.pageSize)},${merchant.page.pageSize}
-	</select>
-
-	<select id="countByTerIds" resultType="int">
-		SELECT COUNT(*)
-		FROM ter_merchant a
-		<where>
-			a.del_flag = #{merchant.DEL_FLAG_NORMAL}
-			<if test="merchant.merchantNum != null and merchant.merchantNum != ''">
-				AND a.merchant_num = #{merchant.merchantNum}
-			</if>
-			<if test="merchant.businessLicense != null and merchant.businessLicense != ''">
-				AND a.business_license = #{merchant.businessLicense}
-			</if>
-			<if test="merchant.merchantName != null and merchant.merchantName != ''">
-				AND a.merchant_name LIKE
-				<if test="dbName == 'oracle'">'%'||#{merchant.merchantName}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{merchant.merchantName}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{merchant.merchantName},'%')</if>
-			</if>
-			<if test="merchant.merchantLegalPerson != null and merchant.merchantLegalPerson != ''">
-				AND a.merchant_legal_person LIKE
-				<if test="dbName == 'oracle'">'%'||#{merchant.merchantLegalPerson}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{merchant.merchantLegalPerson}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{merchant.merchantLegalPerson},'%')</if>
-			</if>
-			<if test="merchant.user != null and merchant.user.id != null and merchant.user.id != ''">
-				AND a.user_id LIKE
-				<if test="dbName == 'oracle'">'%'||#{merchant.user.id}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{merchant.user.id}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{merchant.user.id},'%')</if>
-			</if>
-			<if test="list != null and list.size !=0">
-				AND a.merchant_num IN(
-				SELECT DISTINCT merchant_num from ter_pos_terminal where id in
-				<foreach collection="list" item="id" open="(" separator="," close=")" >
-					#{id}
-				</foreach>
-				)
-			</if>
-		</where>
-	</select>
+	
 </mapper>

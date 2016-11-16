@@ -70,8 +70,9 @@ CREATE TABLE ter_merchant
   id_card VARCHAR(18) COMMENT '身份证号',
   bank_card VARCHAR(100) COMMENT '银行卡号',
   bank_card_account_bank VARCHAR(18) COMMENT '银行卡开户行',
-	user_id VARCHAR(64) NOT NULL COMMENT '所属用户',
+  salesman VARCHAR(20) COMMENT '业务员',
   merchat_desc TEXT COMMENT '详情',
+  office_id varchar(64) NOT NULL COMMENT '机构编号',
 
 	create_by varchar(64) NOT NULL COMMENT '创建者',
 	create_date datetime NOT NULL COMMENT '创建时间',
@@ -81,7 +82,7 @@ CREATE TABLE ter_merchant
 	del_flag char(1) DEFAULT '0' NOT NULL COMMENT '删除标记',
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = '商户表';
-alter table ter_merchant add unique(merchant_num)
+alter table ter_merchant add unique(merchant_num);
 
 
 CREATE TABLE ter_bill_day

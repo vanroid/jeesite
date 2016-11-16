@@ -25,7 +25,7 @@ import com.vanroid.dachuang.modules.merchant.service.TerMerchantService;
 /**
  * 商户管理Controller
  * @author CGZ
- * @version 2016-11-03
+ * @version 2016-11-16
  */
 @Controller
 @RequestMapping(value = "${adminPath}/merchant/terMerchant")
@@ -49,7 +49,7 @@ public class TerMerchantController extends BaseController {
 	@RequiresPermissions("merchant:terMerchant:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(TerMerchant terMerchant, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TerMerchant> page = terMerchantService.findPageByUser(new Page<TerMerchant>(request, response), terMerchant);
+		Page<TerMerchant> page = terMerchantService.findPage(new Page<TerMerchant>(request, response), terMerchant); 
 		model.addAttribute("page", page);
 		return "modules/merchant/terMerchantList";
 	}
@@ -59,13 +59,6 @@ public class TerMerchantController extends BaseController {
 	public String form(TerMerchant terMerchant, Model model) {
 		model.addAttribute("terMerchant", terMerchant);
 		return "modules/merchant/terMerchantForm";
-	}
-
-	@RequiresPermissions("merchant:terMerchant:view")
-	@RequestMapping(value = "view")
-	public String view(TerMerchant terMerchant, Model model) {
-		model.addAttribute("terMerchant", terMerchant);
-		return "modules/merchant/terMerchantView";
 	}
 
 	@RequiresPermissions("merchant:terMerchant:edit")

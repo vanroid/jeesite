@@ -40,7 +40,7 @@ public class OfficeDaoTest extends BaseTest {
     @Test
     public void testSaveOffice(){
         Office rootOffice = new Office();
-        rootOffice.setId(Global.getRootOfficeId());
+        rootOffice.setId(Global.getRootAgentOfficeId());
         Area rootArea = new Area();
         rootArea.setId(Global.getRootAreaId());
 

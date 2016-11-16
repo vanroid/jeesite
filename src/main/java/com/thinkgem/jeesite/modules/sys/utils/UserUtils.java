@@ -118,9 +118,9 @@ public class UserUtils {
         CacheUtils.remove(USER_CACHE, USER_CACHE_ID_ + user.getId());
         CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getLoginName());
         CacheUtils.remove(USER_CACHE, USER_CACHE_LOGIN_NAME_ + user.getOldLoginName());
-        if (user.getOffice() != null && user.getOffice().getId() != null) {
+        /*if (user.getOffice() != null && user.getOffice().getId() != null) {
             CacheUtils.remove(USER_CACHE, USER_CACHE_LIST_BY_OFFICE_ID_ + user.getOffice().getId());
-        }
+        }*/
     }
 
     /**

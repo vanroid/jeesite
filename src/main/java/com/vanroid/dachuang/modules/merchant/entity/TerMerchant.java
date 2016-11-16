@@ -4,7 +4,7 @@
 package com.vanroid.dachuang.modules.merchant.entity;
 
 import org.hibernate.validator.constraints.Length;
-import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.modules.sys.entity.Office;
 import javax.validation.constraints.NotNull;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -12,7 +12,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 /**
  * 商户管理Entity
  * @author CGZ
- * @version 2016-11-03
+ * @version 2016-11-16
  */
 public class TerMerchant extends DataEntity<TerMerchant> {
 	
@@ -31,8 +31,9 @@ public class TerMerchant extends DataEntity<TerMerchant> {
 	private String idCard;		// 身份证号
 	private String bankCard;		// 银行卡号
 	private String bankCardAccountBank;		// 银行卡开户行
-	private User user;		// 所属用户,重要字段
+	private String salesman;		// 业务员
 	private String merchatDesc;		// 详情
+	private Office office;		// 机构编号
 	
 	public TerMerchant() {
 		super();
@@ -168,13 +169,13 @@ public class TerMerchant extends DataEntity<TerMerchant> {
 		this.bankCardAccountBank = bankCardAccountBank;
 	}
 	
-	@NotNull(message="所属用户,重要字段不能为空")
-	public User getUser() {
-		return user;
+	@Length(min=0, max=20, message="业务员长度必须介于 0 和 20 之间")
+	public String getSalesman() {
+		return salesman;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setSalesman(String salesman) {
+		this.salesman = salesman;
 	}
 	
 	public String getMerchatDesc() {
@@ -183,6 +184,15 @@ public class TerMerchant extends DataEntity<TerMerchant> {
 
 	public void setMerchatDesc(String merchatDesc) {
 		this.merchatDesc = merchatDesc;
+	}
+	
+	@NotNull(message="机构编号不能为空")
+	public Office getOffice() {
+		return office;
+	}
+
+	public void setOffice(Office office) {
+		this.office = office;
 	}
 	
 }

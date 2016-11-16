@@ -21,7 +21,6 @@ import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.common.StatusConstants;
 import com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao;
 import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
-import com.vanroid.dachuang.modules.merchant.service.TerMerchantService;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
 import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
@@ -105,7 +104,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         map.put("page", page);
         map.put("DEL_FLAG_NORMAL", 0);
         map.put("terminal", posTerminal);
-        logger.debug("pageSize:{}",page.getPageSize());
+        logger.debug("pageSize:{}", page.getPageSize());
         page.setCount(dao.findListByIdsCount(map));
         page.setList(dao.findListByIds(map));
 
@@ -174,29 +173,172 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     }
 
     private Map<String, Object> importTerminals(ImportExcel importExcel) {
-        logger.debug("开始导入终端");
+        logger.debug("开始导入商户详情表");
+
         int terminalCnt = 0;
+        int merchantCnt = 0;
+        int userCnt = 0;
 
-        List<User> users = Lists.newArrayList();
-
-        Map<String, List<PosTerminal>> userMap = Maps.newHashMap();
+        // 操作用户
+        User curUser = UserUtils.getUser();
+        if (curUser == null || StringUtils.isBlank(curUser.getId())) { // 使用默认导入操作
+            curUser = UserUtils.get(Global.getDefaultUserId());
+        }
 
         int rows = importExcel.getLastDataRowNum();
-        // 遍历每一行,收集 以登录名为key,其他数据为value的map
+
+        {
+            // 机构为key，value存该机构所有的商户
+            Map<String, List<TerMerchant>> officeMap = Maps.newHashMap();
+            // 遍历每一行,收集 以登录名为key,其他数据为value的map
+            for (int i = 1; i < rows; i++) {
+                Row row = importExcel.getRow(i);
+
+                // 没有[商户号][终端号][机构名]的视为无效记录,停止往下执行
+                if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
+                    logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", i);
+                    break;
+                }
+
+                // 机构名/用户名
+                String loginName = row.getCell(21).getStringCellValue();
+                // 机构类型，代理商、分公司等
+                String officeType = row.getCell(22).getStringCellValue();
+
+                // eg:代理商|大创，用于后面分割
+                loginName = officeType + "|" + loginName;
+
+                // 获取此用户下的所有商户
+                List<TerMerchant> terMerchants = officeMap.get(loginName);
+                if (terMerchants == null) {
+                    terMerchants = Lists.newArrayList();
+                }
+                TerMerchant terMerchant = new TerMerchant();
+                // 为字段赋值
+                try {
+                    excelRowToTerMerchant(terMerchant, row);
+                } catch (Exception e) {
+                    logger.error("字段中存在错误值，行数：{}", i);
+                    throw new RuntimeException(e);
+                }
+                terMerchants.add(terMerchant);
+
+                officeMap.put(loginName, terMerchants);
+            }
+
+            // 插入机构\部门\用户
+            Set<String> userLoginNames = officeMap.keySet();
+
+            if (userLoginNames == null || userLoginNames.size() == 0) {
+                logger.debug("检测不到机构/用户，退出执行");
+                Map<String, Object> result = Maps.newHashMap();
+                result.put(StatusConstants.SERVICE_RESULT_MESSAGE, "检测不到机构/用户，退出执行");
+                return result;
+            }
+
+            logger.debug("检测到机构/用户数量：{}", userLoginNames.size());
+
+            // 获取根机构
+            Office rootAgentOffice = new Office();
+            rootAgentOffice.setId(Global.getRootAgentOfficeId());
+            Office rootBranchOffice = new Office();
+            rootBranchOffice.setId(Global.getRootBranchOfficeId());
+
+            Area rootArea = new Area();
+            rootArea.setId(Global.getRootAreaId());
+
+            logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
+
+            // 查的所有公司机构的名称，
+            List<String> companyNames = officeService.findNameList();
+            for (String loginName : userLoginNames) {
+                String[] officeName = loginName.split("|");
+                String officeType = officeName[0];
+                loginName = officeName[1];
+
+                // 检测重复
+                if (companyNames.contains(loginName)) {
+                    logger.debug("检测到重复机构[{}]，已跳过插入", loginName);
+                } else {
+                    // 机构
+                    Office company = new Office();
+                    // 用户
+                    User user = new User();
+
+                    company.setName(loginName);
+                    if ("代理商".equals(officeType)) {
+                        company.setType("2");
+                        company.setParent(rootAgentOffice);
+                        // 代理商角色
+                        List<Role> roles = Lists.newArrayList();
+                        roles.add(new Role(Global.getAgentRoleId()));
+                        user.setRoleList(roles);
+                    } else if ("分公司".equals(officeType)) {
+                        company.setType("1");
+                        company.setParent(rootBranchOffice);
+                        // 设置用户分公司角色
+                        List<Role> roles = Lists.newArrayList();
+                        roles.add(new Role(Global.getBranchRoleId()));
+                        user.setRoleList(roles);
+                    }
+                    company.setArea(rootArea);
+                    company.setCreateBy(curUser);
+                    company.setUpdateBy(curUser);
+                    company.setUseable(StatusConstants.OFFICE_USEABLE_ENABLE);
+
+                    // todo 测试标识
+                    company.setAddress("test");
+                    officeService.save(company);
+
+                    user.setLoginName(loginName);
+                    user.setCompany(company);
+                    user.setCreateBy(curUser);
+                    user.setUpdateBy(curUser);
+                    user.setPassword(SystemService.entryptPassword(StatusConstants.USER_DEFAULT_PASSWORD));
+                    user.setName(loginName);
+                    user.setRemarks(StatusConstants.USER_DEFAULT_REMARKS);
+
+                    systemService.saveUser(user);
+                    userCnt++;
+                }
+
+                Office office = officeService.getByName(loginName);
+
+                // 插入商户
+                // 查找所有商户号，避免重复
+                List<String> merchantNums = terMerchantDao.findMerchantNumList();
+                List<TerMerchant> terMerchants = officeMap.get(loginName);
+                for (TerMerchant terMerchant : terMerchants) {
+                    if (merchantNums.contains(terMerchant.getMerchantNum())) {
+                        logger.debug("检测到重复商户号[{}]，归属机构[{}],已跳过插入", terMerchant.getMerchantNum(), loginName);
+                        continue;
+                    }
+                    terMerchant.setId(terMerchant.getMerchantNum());
+                    terMerchant.setOffice(office);
+                    terMerchant.setCreateBy(curUser);
+                    terMerchant.setUpdateBy(curUser);
+                    // todo 测试标识
+                    terMerchant.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
+                    terMerchantDao.insert(terMerchant);
+                    merchantCnt++;
+                }
+
+            }
+            logger.debug("共导入机构/用户数：{}", userCnt);
+            logger.debug("共导入商户数：{}", merchantCnt);
+        }
+
+
+        List<PosTerminal> posTerminals = Lists.newArrayList();
+        // 查找所有的终端ID，避免重复
+        List<String> terNums = findTerNumList();
+        // 再次遍历每一行,收集所有终端
         for (int i = 1; i < rows; i++) {
             Row row = importExcel.getRow(i);
-
-            // 没有[商户号][终端号][后台账户]的视为无效记录,停止往下执行
+            // 没有[商户号][终端号][机构名]的视为无效记录,停止往下执行
             if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
                 logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", i);
                 break;
-            }
-
-            String loginName = row.getCell(24).getStringCellValue();
-            // 获取此用户下的所有终端
-            List<PosTerminal> userPosTerminals = userMap.get(loginName);
-            if (userPosTerminals == null) {
-                userPosTerminals = Lists.newArrayList();
             }
             PosTerminal posTerminal = new PosTerminal();
             // 为字段赋值
@@ -206,128 +348,23 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 logger.error("字段中存在错误值，行数：{}", i);
                 throw new RuntimeException(e);
             }
-            userPosTerminals.add(posTerminal);
 
-            userMap.put(loginName, userPosTerminals);
-
-        }
-
-        int userCnt = 0;
-
-        // 插入机构\部门\用户
-        Set<String> userLoginNames = userMap.keySet();
-
-        if (userLoginNames == null || userLoginNames.size() == 0) {
-            logger.debug("检测不到用户，退出执行");
-            Map<String, Object> result = Maps.newHashMap();
-            result.put(StatusConstants.SERVICE_RESULT_MESSAGE, "检测不到用户，退出执行");
-            return result;
-        }
-
-        logger.debug("检测到用户数量：{}", userLoginNames.size());
-
-        // 获取根机构
-        Office rootOffice = new Office();
-        rootOffice.setId(Global.getRootOfficeId());
-        Area rootArea = new Area();
-        rootArea.setId(Global.getRootAreaId());
-        // 操作用户
-        User curUser = UserUtils.getUser();
-        if (curUser == null || StringUtils.isBlank(curUser.getId())) { // 使用默认导入操作
-            curUser = UserUtils.get(Global.getDefaultUserId());
-        }
-        logger.debug("正在操作操作的用户是:{}:{}", curUser.getId(), curUser.getName());
-
-
-        // 查的所有公司机构的名称，
-        List<String> companyNames = officeService.findNameList();
-        // 查找所有的终端ID，避免重复
-        List<String> terNums = findTerNumList();
-        for (String loginName : userLoginNames) {
-            // 检测重复
-            if (companyNames.contains(loginName)) {
-                logger.debug("检测到重复机构[{}]，已跳过插入", loginName);
-
-            } else {
-
-                // 机构
-                Office company = new Office();
-                company.setName(loginName);
-                company.setType(StatusConstants.OFFICE_TYPE_COMPANY);
-                company.setArea(rootArea);
-                company.setCreateBy(curUser);
-                company.setUpdateBy(curUser);
-                company.setUseable(StatusConstants.OFFICE_USEABLE_ENABLE);
-                // 所有导入的机构都是在[代理商之下]
-                company.setParent(rootOffice);
-
-
-                // todo 测试标识
-                company.setAddress("test");
-                officeService.save(company);
-
-                // 部门
-                Office office = new Office();
-                office.setName(StatusConstants.OFFICE_DEFULT_OFFICE_NAME);
-                office.setParent(company);
-                office.setType(StatusConstants.OFFICE_TYPE_OFFICE);
-                office.setArea(rootArea);
-                office.setCreateBy(curUser);
-                office.setUpdateBy(curUser);
-                office.setUseable(StatusConstants.OFFICE_USEABLE_ENABLE);
-                // todo 测试标识
-                office.setAddress("test");
-                officeService.save(office);
-
-                // 用户
-                User user = new User();
-                user.setLoginName(loginName);
-                user.setCompany(company);
-                user.setOffice(office);
-                user.setCreateBy(curUser);
-                user.setUpdateBy(curUser);
-                user.setPassword(SystemService.entryptPassword(StatusConstants.USER_DEFAULT_PASSWORD));
-                user.setName(loginName);
-                user.setRemarks(StatusConstants.USER_DEFAULT_REMARKS);
-                // 代理商角色
-                List<Role> roles = Lists.newArrayList();
-                roles.add(new Role(Global.getAgentRoleId()));
-                user.setRoleList(roles);
-
-
-                systemService.saveUser(user);
-                userCnt++;
+            if (terNums.contains(posTerminal.getTerminalNum())) {
+                logger.debug("检测到重复终端号[{}],已跳过插入", posTerminal.getTerminalNum());
+                continue;
             }
-
-            User user = UserUtils.getByLoginName(loginName);
-
-            // 插入终端
-            List<PosTerminal> terminals = userMap.get(loginName);
-            for (PosTerminal posTerminal : terminals) {
-
-                if (terNums.contains(posTerminal.getTerminalNum())) {
-                    logger.debug("检测到重复终端号[{}]，归属用户[{}],已跳过插入", posTerminal.getTerminalNum(), loginName);
-                    continue;
-                }
-
-                // 后台编号,所属用户
-                posTerminal.setUser(user);
-                posTerminal.setCreateBy(curUser);
-                posTerminal.setUpdateBy(curUser);
-                // todo 测试标识
-                posTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
-                this.save(posTerminal);
-                terminalCnt++;
-            }
-            logger.debug("共导入终端数:{}", terminalCnt);
-
+            posTerminals.add(posTerminal);
+            // 后台编号,所属用户
+            posTerminal.setCreateBy(curUser);
+            posTerminal.setUpdateBy(curUser);
+            // todo 测试标识
+            posTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
+            posTerminal.setId(posTerminal.getTerminalNum());
         }
-        logger.debug("共导入用户数：{}", userCnt);
+        // 批量插入所有终端
+        terminalCnt = dao.batchInsert(posTerminals);
 
-        // todo 增量导入商户
-        int merchantCnt = terMerchantDao.insertMerchantFromTerminal();
-
-        logger.debug("共导入商户数：{}", merchantCnt);
+        logger.debug("共导入终端数:{}", terminalCnt);
 
         Map result = Maps.newHashMap();
         StringBuilder sb = new StringBuilder("成功导入机构数/用户数：");
@@ -340,6 +377,53 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         result.put(StatusConstants.SERVICE_RESULT_MESSAGE, sb.toString());
 
         return result;
+    }
+
+    /**
+     * 将行转换为商户
+     * 进件日期0	下机日期1	 装机日期2 	交件支行3 	机型	机身号4	商户号5	终端号6
+     * 营业执照号码7	商户名称8	 地址9	法人10	入账人11	 联系电话12	装机电话13
+     * 借记卡费率	14 贷记卡费率15	外币卡费率16	机具类型17
+     * 身份证号码18	银行卡19	业务员20	 所属机构21	机构类型22	父级机构23
+     *
+     * @param terMerchant
+     * @param row
+     */
+    private void excelRowToTerMerchant(TerMerchant terMerchant, Row row) {
+
+        // 商户号
+        terMerchant.setMerchantNum(ExcelUtils.getStringCellValue(row, 5));
+        // 微信二维码
+        //terMerchant.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
+        // 营业执照号码
+        terMerchant.setBusinessLicense(ExcelUtils.getStringCellValue(row, 7));
+        // 商户名称
+        terMerchant.setMerchantName(ExcelUtils.getStringCellValue(row, 8));
+        // 地址
+        terMerchant.setMerchantAddress(ExcelUtils.getStringCellValue(row, 9));
+        // 法人
+        terMerchant.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 10));
+        // 入账人
+        terMerchant.setBookingPerson(ExcelUtils.getStringCellValue(row, 11));
+        // 联系电话
+        terMerchant.setTelphone(ExcelUtils.getStringCellValue(row, 12));
+        // 借记卡费率
+        terMerchant.setDebitRate(ExcelUtils.getStringCellValue(row, 14));
+        // 贷记卡费率
+        terMerchant.setCreditRate(ExcelUtils.getStringCellValue(row, 15));
+        // 外币卡费率
+        terMerchant.setForeignRate(ExcelUtils.getStringCellValue(row, 16));
+        // 身份证号码
+        terMerchant.setIdCard(ExcelUtils.getStringCellValue(row, 18));
+        // 银行卡
+        terMerchant.setBankCard(ExcelUtils.getStringCellValue(row, 19));
+        // 银行卡开户行
+        //terMerchant.setBankCardAccountBank(ExcelUtils.getStringCellValue(row, 23));
+        // 业务员
+        terMerchant.setSalesman(ExcelUtils.getStringCellValue(row, 20));
+        // 详情
+        //terMerchant.setMerchatDesc(ExcelUtils.getStringCellValue(row, 26));
+
     }
 
 
