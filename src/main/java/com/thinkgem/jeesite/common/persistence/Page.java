@@ -274,8 +274,27 @@ public class Page<T> {
         sb.append("<li class=\"disabled controls\"><a href=\"javascript:\">当前 ");
         sb.append("<input type=\"text\" value=\"" + pageNo + "\" onkeypress=\"var e=window.event||event;var c=e.keyCode||e.which;if(c==13)");
         sb.append(funcName + "(this.value," + pageSize + ",'" + funcParam + "');\" onclick=\"this.select();\"/> / ");
-        sb.append("<input type=\"text\" value=\"" + pageSize + "\" onkeypress=\"var e=window.event||event;var c=e.keyCode||e.which;if(c==13)");
-        sb.append(funcName + "(" + pageNo + ",this.value,'" + funcParam + "');\" onclick=\"this.select();\"/> 条，");
+
+        /*sb.append("<input type=\"text\" value=\"" + pageSize + "\" onkeypress=\"var e=window.event||event;var c=e.keyCode||e.which;if(c==13)");
+        sb.append(funcName + "(" + pageNo + ",this.value,'" + funcParam + "');\" onclick=\"this.select();\"/> 条，");*/
+        sb.append("<select onchange=\"page(");
+        sb.append(pageNo);
+        sb.append(",$(this).val())\">");
+        if (pageSize == 20) {
+            sb.append("<option selected=\"selected\">20</option>");
+            sb.append("<option>50</option>");
+            sb.append("<option>100</option>");
+        } else if (pageSize == 50) {
+            sb.append("<option>20</option>");
+            sb.append("<option selected=\"selected\">50</option>");
+            sb.append("<option>100</option>");
+        } else if (pageSize == 100) {
+            sb.append("<option>20</option>");
+            sb.append("<option>50</option>");
+            sb.append("<option selected=\"selected\">100</option>");
+        }
+        sb.append("</select>");
+
         sb.append("共 " + count + " 条" + (message != null ? message : "") + "</a></li>\n");
 
         sb.insert(0, "<ul>\n").append("</ul>\n");
