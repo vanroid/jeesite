@@ -5,6 +5,7 @@ package com.vanroid.dachuang.modules.terminal.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -189,29 +190,28 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
         {
             // 机构为key，value存该机构所有的商户
-            Map<String, List<TerMerchant>> officeMap = Maps.newHashMap();
+            Map<String, Set<TerMerchant>> officeMap = Maps.newHashMap();
             // 遍历每一行,收集 以登录名为key,其他数据为value的map
             for (int i = 1; i < rows; i++) {
                 Row row = importExcel.getRow(i);
 
                 // 没有[商户号][终端号][机构名]的视为无效记录,停止往下执行
-                if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
-                    logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", i);
+                if (!hasNextValidRow(row)) {
                     break;
                 }
 
                 // 机构名/用户名
-                String loginName = row.getCell(21).getStringCellValue();
+                String loginName = row.getCell(22).getStringCellValue();
                 // 机构类型，代理商、分公司等
-                String officeType = row.getCell(22).getStringCellValue();
+                String officeType = row.getCell(23).getStringCellValue();
 
-                // eg:代理商|大创，用于后面分割
-                loginName = officeType + "|" + loginName;
+                // eg:代理商,大创，用于后面分割
+                loginName = officeType + "," + loginName;
 
                 // 获取此用户下的所有商户
-                List<TerMerchant> terMerchants = officeMap.get(loginName);
+                Set<TerMerchant> terMerchants = officeMap.get(loginName);
                 if (terMerchants == null) {
-                    terMerchants = Lists.newArrayList();
+                    terMerchants = Sets.newHashSet();
                 }
                 TerMerchant terMerchant = new TerMerchant();
                 // 为字段赋值
@@ -252,7 +252,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
             // 查的所有公司机构的名称，
             List<String> companyNames = officeService.findNameList();
             for (String loginName : userLoginNames) {
-                String[] officeName = loginName.split("|");
+                String[] officeName = loginName.split(",");
                 String officeType = officeName[0];
                 loginName = officeName[1];
 
@@ -260,6 +260,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 if (companyNames.contains(loginName)) {
                     logger.debug("检测到重复机构[{}]，已跳过插入", loginName);
                 } else {
+                    logger.debug("正在录入用户：{}", loginName);
                     // 机构
                     Office company = new Office();
                     // 用户
@@ -307,9 +308,12 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 // 插入商户
                 // 查找所有商户号，避免重复
                 List<String> merchantNums = terMerchantDao.findMerchantNumList();
-                List<TerMerchant> terMerchants = officeMap.get(loginName);
+                Set<TerMerchant> terMerchants = officeMap.get(officeType + "," + loginName);
+
+                logger.debug("size:{}", merchantNums.size());
+
                 for (TerMerchant terMerchant : terMerchants) {
-                    if (merchantNums.contains(terMerchant.getMerchantNum())) {
+                    if (merchantNums != null && merchantNums.size() != 0 && merchantNums.contains(terMerchant.getMerchantNum())) {
                         logger.debug("检测到重复商户号[{}]，归属机构[{}],已跳过插入", terMerchant.getMerchantNum(), loginName);
                         continue;
                     }
@@ -317,6 +321,9 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                     terMerchant.setOffice(office);
                     terMerchant.setCreateBy(curUser);
                     terMerchant.setUpdateBy(curUser);
+                    Date curDate = new Date();
+                    terMerchant.setCreateDate(curDate);
+                    terMerchant.setUpdateDate(curDate);
                     // todo 测试标识
                     terMerchant.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
                     terMerchantDao.insert(terMerchant);
@@ -336,8 +343,7 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         for (int i = 1; i < rows; i++) {
             Row row = importExcel.getRow(i);
             // 没有[商户号][终端号][机构名]的视为无效记录,停止往下执行
-            if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(24))) {
-                logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", i);
+            if (!hasNextValidRow(row)) {
                 break;
             }
             PosTerminal posTerminal = new PosTerminal();
@@ -363,7 +369,6 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         }
         // 批量插入所有终端
         terminalCnt = dao.batchInsert(posTerminals);
-
         logger.debug("共导入终端数:{}", terminalCnt);
 
         Map result = Maps.newHashMap();
@@ -379,12 +384,21 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         return result;
     }
 
+    private boolean hasNextValidRow(Row row) {
+        //没有[商户号][终端号][机构名]的视为无效记录,停止往下执行
+        if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(22))) {
+            logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", row.getRowNum());
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 将行转换为商户
-     * 进件日期0	下机日期1	 装机日期2 	交件支行3 	机型	机身号4	商户号5	终端号6
-     * 营业执照号码7	商户名称8	 地址9	法人10	入账人11	 联系电话12	装机电话13
-     * 借记卡费率	14 贷记卡费率15	外币卡费率16	机具类型17
-     * 身份证号码18	银行卡19	业务员20	 所属机构21	机构类型22	父级机构23
+     * 进件日期0	下机日期1	 装机日期2 	交件支行3 	机型4	机身号5	商户号6	终端号7
+     * 营业执照号码8	商户名称9	 地址10	法人11	入账人12	 联系电话13	装机电话14
+     * 借记卡费率	15 贷记卡费率16	外币卡费率17	机具类型18
+     * 身份证号码19	银行卡20	业务员21	 所属机构22	机构类型23	父级机构24
      *
      * @param terMerchant
      * @param row
@@ -392,35 +406,35 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     private void excelRowToTerMerchant(TerMerchant terMerchant, Row row) {
 
         // 商户号
-        terMerchant.setMerchantNum(ExcelUtils.getStringCellValue(row, 5));
+        terMerchant.setMerchantNum(ExcelUtils.getStringCellValue(row, 6));
         // 微信二维码
         //terMerchant.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
         // 营业执照号码
-        terMerchant.setBusinessLicense(ExcelUtils.getStringCellValue(row, 7));
+        terMerchant.setBusinessLicense(ExcelUtils.getStringCellValue(row, 8));
         // 商户名称
-        terMerchant.setMerchantName(ExcelUtils.getStringCellValue(row, 8));
+        terMerchant.setMerchantName(ExcelUtils.getStringCellValue(row, 9));
         // 地址
-        terMerchant.setMerchantAddress(ExcelUtils.getStringCellValue(row, 9));
+        terMerchant.setMerchantAddress(ExcelUtils.getStringCellValue(row, 10));
         // 法人
-        terMerchant.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 10));
+        terMerchant.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 11));
         // 入账人
-        terMerchant.setBookingPerson(ExcelUtils.getStringCellValue(row, 11));
+        terMerchant.setBookingPerson(ExcelUtils.getStringCellValue(row, 12));
         // 联系电话
-        terMerchant.setTelphone(ExcelUtils.getStringCellValue(row, 12));
+        terMerchant.setTelphone(ExcelUtils.getStringCellValue(row, 13));
         // 借记卡费率
-        terMerchant.setDebitRate(ExcelUtils.getStringCellValue(row, 14));
+        terMerchant.setDebitRate(ExcelUtils.getStringCellValue(row, 15));
         // 贷记卡费率
-        terMerchant.setCreditRate(ExcelUtils.getStringCellValue(row, 15));
+        terMerchant.setCreditRate(ExcelUtils.getStringCellValue(row, 16));
         // 外币卡费率
-        terMerchant.setForeignRate(ExcelUtils.getStringCellValue(row, 16));
+        terMerchant.setForeignRate(ExcelUtils.getStringCellValue(row, 17));
         // 身份证号码
-        terMerchant.setIdCard(ExcelUtils.getStringCellValue(row, 18));
+        terMerchant.setIdCard(ExcelUtils.getStringCellValue(row, 19));
         // 银行卡
-        terMerchant.setBankCard(ExcelUtils.getStringCellValue(row, 19));
+        terMerchant.setBankCard(ExcelUtils.getStringCellValue(row, 20));
         // 银行卡开户行
         //terMerchant.setBankCardAccountBank(ExcelUtils.getStringCellValue(row, 23));
         // 业务员
-        terMerchant.setSalesman(ExcelUtils.getStringCellValue(row, 20));
+        terMerchant.setSalesman(ExcelUtils.getStringCellValue(row, 21));
         // 详情
         //terMerchant.setMerchatDesc(ExcelUtils.getStringCellValue(row, 26));
 
@@ -437,6 +451,15 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         return dao.findTerNumList();
     }
 
+    /**
+     * * 进件日期0	下机日期1	 装机日期2 	交件支行3 	机型4	机身号5	商户号6	终端号7
+     * 营业执照号码8	商户名称9	 地址10	法人11	入账人12	 联系电话13	装机电话14
+     * 借记卡费率	15 贷记卡费率16	外币卡费率17	机具类型18
+     * 身份证号码19	银行卡20	业务员21	 所属机构22	机构类型23	父级机构24
+     *
+     * @param posTerminal
+     * @param row
+     */
     private void excelRowToPosterminal(PosTerminal posTerminal, Row row) {
         // 进件日期
         posTerminal.setImportDate(ExcelUtils.getDateCellValue(row, 0));

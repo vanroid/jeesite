@@ -51,4 +51,12 @@ public interface PosTerminalDao extends CrudDao<PosTerminal> {
      * @return
      */
     List<String> findTerNumList();
+
+    /**
+     * 批量插入
+     *
+     * @param posTerminals
+     * @return
+     */
+    int batchInsert(List<PosTerminal> posTerminals);
 }

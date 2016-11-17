@@ -177,5 +177,8 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
-	
+
+	<select id="findMerchantNumList" resultType="String">
+		SELECT merchant_num from ter_merchant
+	</select>
 </mapper>

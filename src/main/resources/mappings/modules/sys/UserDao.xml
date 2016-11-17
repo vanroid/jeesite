@@ -228,7 +228,7 @@
 		INSERT INTO sys_user(
 			id, 
 			company_id, 
-			office_id, 
+			office_id,
 			login_name, 
 			password, 
 			no, 
@@ -248,7 +248,7 @@
 		) VALUES (
 			#{id}, 
 			#{company.id}, 
-			#{office.id}, 
+			#{office.id},
 			#{loginName}, 
 			#{password}, 
 			#{no}, 
@@ -272,7 +272,7 @@
 	<update id="update">
 		UPDATE sys_user SET 
 			company_id = #{company.id}, 
-			office_id = #{office.id}, 
+			office_id = #{office.id},
 			login_name = #{loginName}, 
 			password = #{password}, 
 			no = #{no}, 

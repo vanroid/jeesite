@@ -185,5 +185,12 @@
 	<select id="findCompanyNameList" resultType="String">
 		SELECT name FROM sys_office WHERE type = '1';
 	</select>
-	
+
+	<select id="getByName" resultType="Office">
+		SELECT
+		<include refid="officeColumns"/>
+		FROM sys_office a
+		<include refid="officeJoins"/>
+		WHERE a.name = #{name}
+	</select>
 </mapper>
