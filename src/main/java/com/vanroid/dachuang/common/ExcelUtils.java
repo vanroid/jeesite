@@ -3,6 +3,7 @@ package com.vanroid.dachuang.common;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -19,7 +20,7 @@ public class ExcelUtils {
             if (cellType == Cell.CELL_TYPE_ERROR)
                 return null;
             if (cellType == Cell.CELL_TYPE_NUMERIC) {
-                return String.valueOf(cell.getNumericCellValue());
+                return new BigDecimal(cell.getNumericCellValue()).toPlainString();
             }
             return cell.getStringCellValue();
         }

@@ -78,14 +78,14 @@
                 <td>${terMerchant.bankCardAccountBank}</td>
             </tr>
             <tr>
-                <td>所属用户：</td>
-                <td>${terMerchant.user.name}</td>
-                <td>详情：</td>
-                <td>${terMerchant.merchatDesc}</td>
+                <td>所属机构：</td>
+                <td>${terMerchant.office.name}</td>
+                <td>业务员：</td>
+                <td>${terMerchant.salesman}</td>
             </tr>
             <tr>
                 <td>备注信息：</td>
-                <td>${terMerchant.remarks}</td>
+                <td>${terMerchant.merchatDesc}</td>
             </tr>
         </table>
         <div class="form-actions">

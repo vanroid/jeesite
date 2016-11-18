@@ -61,6 +61,13 @@ public class TerMerchantController extends BaseController {
 		return "modules/merchant/terMerchantForm";
 	}
 
+	@RequiresPermissions("merchant:terMerchant:view")
+	@RequestMapping(value = "view")
+	public String view(TerMerchant terMerchant, Model model) {
+		model.addAttribute("terMerchant", terMerchant);
+		return "modules/merchant/terMerchantView";
+	}
+
 	@RequiresPermissions("merchant:terMerchant:edit")
 	@RequestMapping(value = "save")
 	public String save(TerMerchant terMerchant, Model model, RedirectAttributes redirectAttributes) {
