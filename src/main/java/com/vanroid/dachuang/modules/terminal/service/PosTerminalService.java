@@ -23,18 +23,17 @@ import com.vanroid.dachuang.common.StatusConstants;
 import com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao;
 import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
 import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
+import com.vanroid.dachuang.modules.terminal.dao.TerTerminalDao;
 import com.vanroid.dachuang.modules.terminal.entity.Bill;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
+import com.vanroid.dachuang.modules.terminal.entity.TerTerminal;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * POS终端Service
@@ -54,6 +53,9 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
     @Autowired
     private TerMerchantDao terMerchantDao;
+
+    @Autowired
+    private TerTerminalDao terTerminalDao;
 
     public PosTerminal get(String id) {
         PosTerminal posTerminal = super.get(id);
@@ -201,14 +203,16 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                 }
 
                 // 机构名/用户名
-                String loginName = row.getCell(22).getStringCellValue();
+                String loginName = row.getCell(20).getStringCellValue();
                 // 机构类型，代理商、分公司等
-                String officeType = row.getCell(23).getStringCellValue();
+                String officeType = row.getCell(21).getStringCellValue();
+
+                logger.debug("loginName:{},officeType:{}", loginName, officeType);
 
                 // eg:代理商,大创，用于后面分割
                 loginName = officeType + "," + loginName;
 
-                // 获取此用户下的所有商户
+                // 获取此机构下的所有商户
                 Set<TerMerchant> terMerchants = officeMap.get(loginName);
                 if (terMerchants == null) {
                     terMerchants = Sets.newHashSet();
@@ -222,7 +226,6 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
                     throw new RuntimeException(e);
                 }
                 terMerchants.add(terMerchant);
-
                 officeMap.put(loginName, terMerchants);
             }
 
@@ -252,12 +255,17 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
             // 查的所有公司机构的名称，
             List<String> companyNames = officeService.findNameList();
             for (String loginName : userLoginNames) {
+                logger.debug("loginNamein259:{}", loginName);
                 String[] officeName = loginName.split(",");
                 String officeType = officeName[0];
                 loginName = officeName[1];
 
-                // 检测重复
-                if (companyNames.contains(loginName)) {
+
+                // 检测`总部`机构
+                if (loginName.equals("大创总部")) {
+                    // 不需要处理机构插入和用户插入
+                    logger.debug("检测到总部机构[{}]，已跳过插入", loginName);
+                } else if (companyNames.contains(loginName)) { // 检测重复
                     logger.debug("检测到重复机构[{}]，已跳过插入", loginName);
                 } else {
                     logger.debug("正在录入用户：{}", loginName);
@@ -336,9 +344,9 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         }
 
 
-        List<PosTerminal> posTerminals = Lists.newArrayList();
+        Set<TerTerminal> terTerminals = Sets.newHashSet();
         // 查找所有的终端ID，避免重复
-        List<String> terNums = findTerNumList();
+        List<String> terNums = terTerminalDao.findTerNumList();
         // 再次遍历每一行,收集所有终端
         for (int i = 1; i < rows; i++) {
             Row row = importExcel.getRow(i);
@@ -346,29 +354,33 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
             if (!hasNextValidRow(row)) {
                 break;
             }
-            PosTerminal posTerminal = new PosTerminal();
+            TerTerminal terTerminal = new TerTerminal();
             // 为字段赋值
             try {
-                excelRowToPosterminal(posTerminal, row);
+                excelRowToterminal(terTerminal, row);
             } catch (Exception e) {
                 logger.error("字段中存在错误值，行数：{}", i);
                 throw new RuntimeException(e);
             }
 
-            if (terNums.contains(posTerminal.getTerminalNum())) {
-                logger.debug("检测到重复终端号[{}],已跳过插入", posTerminal.getTerminalNum());
+            if (terNums.contains(terTerminal.getTerminalNum())) {
+                logger.debug("检测到重复终端号[{}],已跳过插入", terTerminal.getTerminalNum());
                 continue;
             }
-            posTerminals.add(posTerminal);
             // 后台编号,所属用户
-            posTerminal.setCreateBy(curUser);
-            posTerminal.setUpdateBy(curUser);
+            terTerminal.setCreateBy(curUser);
+            terTerminal.setUpdateBy(curUser);
+            Date curDate = new Date();
+            terTerminal.setCreateDate(curDate);
+            terTerminal.setUpdateDate(curDate);
             // todo 测试标识
-            posTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
-            posTerminal.setId(posTerminal.getTerminalNum());
+            terTerminal.setRemarks(StatusConstants.TERMINAL_DEFAULT_REMARKS);
+            terTerminal.setId(terTerminal.getTerminalNum());
+
+            terTerminals.add(terTerminal);
         }
         // 批量插入所有终端
-        terminalCnt = dao.batchInsert(posTerminals);
+        terminalCnt = terTerminalDao.batchInsert(new ArrayList(terTerminals));
         logger.debug("共导入终端数:{}", terminalCnt);
 
         Map result = Maps.newHashMap();
@@ -384,9 +396,10 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
         return result;
     }
 
+
     private boolean hasNextValidRow(Row row) {
         //没有[商户号][终端号][机构名]的视为无效记录,停止往下执行
-        if (ExcelUtils.cellIsBank(row.getCell(6)) || ExcelUtils.cellIsBank(row.getCell(7)) || ExcelUtils.cellIsBank(row.getCell(22))) {
+        if (ExcelUtils.cellIsBank(row.getCell(3)) || ExcelUtils.cellIsBank(row.getCell(4)) || ExcelUtils.cellIsBank(row.getCell(20))) {
             logger.debug("导入信息时发现必需字段缺失，行数：{}，结束扫描", row.getRowNum());
             return false;
         }
@@ -395,10 +408,9 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
 
     /**
      * 将行转换为商户
-     * 进件日期0	下机日期1	 装机日期2 	交件支行3 	机型4	机身号5	商户号6	终端号7
-     * 营业执照号码8	商户名称9	 地址10	法人11	入账人12	 联系电话13	装机电话14
-     * 借记卡费率	15 贷记卡费率16	外币卡费率17	机具类型18
-     * 身份证号码19	银行卡20	业务员21	 所属机构22	机构类型23	父级机构24
+     * 序号0	 下机日期1	 入账支行2	商户号3	终端号4	机型号5	机身号6
+     * 商户名称7	地址8 法人9	联系人10  联系电话11	装机电话12	贷记卡手续费13	借记卡手续费14	境外费率15
+     * 机具类型16 身份证号17	银行卡号18	业务员19	 所诉机构20	机构类型21	父级机构22	装机人23 	通讯卡号24	备注25
      *
      * @param terMerchant
      * @param row
@@ -406,35 +418,35 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     private void excelRowToTerMerchant(TerMerchant terMerchant, Row row) {
 
         // 商户号
-        terMerchant.setMerchantNum(ExcelUtils.getStringCellValue(row, 6));
+        terMerchant.setMerchantNum(ExcelUtils.getStringCellValue(row, 3));
         // 微信二维码
         //terMerchant.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
         // 营业执照号码
-        terMerchant.setBusinessLicense(ExcelUtils.getStringCellValue(row, 8));
+        //terMerchant.setBusinessLicense(ExcelUtils.getStringCellValue(row, 8));
         // 商户名称
-        terMerchant.setMerchantName(ExcelUtils.getStringCellValue(row, 9));
+        terMerchant.setMerchantName(ExcelUtils.getStringCellValue(row, 7));
         // 地址
-        terMerchant.setMerchantAddress(ExcelUtils.getStringCellValue(row, 10));
+        terMerchant.setMerchantAddress(ExcelUtils.getStringCellValue(row, 8));
         // 法人
-        terMerchant.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 11));
+        terMerchant.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 9));
         // 入账人
-        terMerchant.setBookingPerson(ExcelUtils.getStringCellValue(row, 12));
+        //terMerchant.setBookingPerson(ExcelUtils.getStringCellValue(row, 12));
         // 联系电话
-        terMerchant.setTelphone(ExcelUtils.getStringCellValue(row, 13));
+        terMerchant.setTelphone(ExcelUtils.getStringCellValue(row, 11));
         // 借记卡费率
-        terMerchant.setDebitRate(ExcelUtils.getStringCellValue(row, 15));
+        terMerchant.setDebitRate(ExcelUtils.getStringCellValue(row, 14));
         // 贷记卡费率
-        terMerchant.setCreditRate(ExcelUtils.getStringCellValue(row, 16));
+        terMerchant.setCreditRate(ExcelUtils.getStringCellValue(row, 13));
         // 外币卡费率
-        terMerchant.setForeignRate(ExcelUtils.getStringCellValue(row, 17));
+        terMerchant.setForeignRate(ExcelUtils.getStringCellValue(row, 15));
         // 身份证号码
-        terMerchant.setIdCard(ExcelUtils.getStringCellValue(row, 19));
+        terMerchant.setIdCard(ExcelUtils.getStringCellValue(row, 17));
         // 银行卡
-        terMerchant.setBankCard(ExcelUtils.getStringCellValue(row, 20));
+        terMerchant.setBankCard(ExcelUtils.getStringCellValue(row, 18));
         // 银行卡开户行
         //terMerchant.setBankCardAccountBank(ExcelUtils.getStringCellValue(row, 23));
         // 业务员
-        terMerchant.setSalesman(ExcelUtils.getStringCellValue(row, 21));
+        terMerchant.setSalesman(ExcelUtils.getStringCellValue(row, 19));
         // 详情
         //terMerchant.setMerchatDesc(ExcelUtils.getStringCellValue(row, 26));
 
@@ -452,71 +464,38 @@ public class PosTerminalService extends CrudService<PosTerminalDao, PosTerminal>
     }
 
     /**
-     * * 进件日期0	下机日期1	 装机日期2 	交件支行3 	机型4	机身号5	商户号6	终端号7
-     * 营业执照号码8	商户名称9	 地址10	法人11	入账人12	 联系电话13	装机电话14
-     * 借记卡费率	15 贷记卡费率16	外币卡费率17	机具类型18
-     * 身份证号码19	银行卡20	业务员21	 所属机构22	机构类型23	父级机构24
+     * 序号0	 下机日期1	 入账支行2	商户号3	终端号4	机型号5	机身号6
+     * 商户名称7	地址8 法人9	联系人10  联系电话11	装机电话12	贷记卡手续费13	借记卡手续费14	境外费率15
+     * 机具类型16 身份证号17	银行卡号18	业务员19	 所诉机构20	机构类型21	父级机构22	装机人23 	通讯卡号24	备注25
      *
-     * @param posTerminal
+     * @param terTerminal
      * @param row
      */
-    private void excelRowToPosterminal(PosTerminal posTerminal, Row row) {
-        // 进件日期
-        posTerminal.setImportDate(ExcelUtils.getDateCellValue(row, 0));
-        //下机日期
-        posTerminal.setDownDate(ExcelUtils.getDateCellValue(row, 1));
-        // 装机日期
-        posTerminal.setInstallDate(ExcelUtils.getDateCellValue(row, 2));
-        // 交件支行
-        posTerminal.setTransBank(ExcelUtils.getStringCellValue(row, 3));
-        // 机身号
-        posTerminal.setDeviceNum(ExcelUtils.getStringCellValue(row, 4));
-        // 机子型号
-        posTerminal.setDeviceType(ExcelUtils.getStringCellValue(row, 5));
-        // 商户号
-        posTerminal.setMerchantNum(ExcelUtils.getStringCellValue(row, 6));
+    private void excelRowToterminal(TerTerminal terTerminal, Row row) {
+        // 下机日期
+        terTerminal.setDownDate(ExcelUtils.getDateCellValue(row, 1));
         // 终端号
-        posTerminal.setTerminalNum(ExcelUtils.getStringCellValue(row, 7));
-        // 微信二维码
-        posTerminal.setWechatUrl(ExcelUtils.getStringCellValue(row, 8));
-        // 营业执照号码
-        posTerminal.setBusinessLicense(ExcelUtils.getStringCellValue(row, 9));
-        // 商户名称
-        posTerminal.setMerchantName(ExcelUtils.getStringCellValue(row, 10));
-        // 地址
-        posTerminal.setMerchantAddress(ExcelUtils.getStringCellValue(row, 11));
-        // 法人
-        posTerminal.setMerchantLegalPerson(ExcelUtils.getStringCellValue(row, 12));
-        // 入账人
-        posTerminal.setBookingPerson(ExcelUtils.getStringCellValue(row, 13));
-        // 联系电话
-        posTerminal.setTelphone(ExcelUtils.getStringCellValue(row, 14));
+        terTerminal.setTerminalNum(ExcelUtils.getStringCellValue(row, 4));
+        // 机型号
+        terTerminal.setDeviceType(ExcelUtils.getStringCellValue(row, 5));
+        // 机身号
+        terTerminal.setDeviceNum(ExcelUtils.getStringCellValue(row, 6));
         // 装机电话
-        posTerminal.setInstallPhone(ExcelUtils.getStringCellValue(row, 15));
-        // MCC码
-        posTerminal.setDeviceMcc(ExcelUtils.getStringCellValue(row, 16));
-        // 借记卡费率
-        posTerminal.setDebitRate(ExcelUtils.getStringCellValue(row, 17));
-        // 贷记卡费率
-        posTerminal.setCreditRate(ExcelUtils.getStringCellValue(row, 18));
-        // 外币卡费率
-        posTerminal.setForeignRate(ExcelUtils.getStringCellValue(row, 19));
+        terTerminal.setInstallPhone(ExcelUtils.getStringCellValue(row, 12));
         // 机具类型
-        posTerminal.setMachineType(ExcelUtils.getStringCellValue(row, 20));
-        // 身份证号码
-        posTerminal.setIdCard(ExcelUtils.getStringCellValue(row, 21));
-        // 银行卡
-        posTerminal.setBankCard(ExcelUtils.getStringCellValue(row, 22));
-        // 银行卡开户行
-        posTerminal.setBankCardAccountBank(ExcelUtils.getStringCellValue(row, 23));
-
-        // 业务员
-        posTerminal.setSalesman(ExcelUtils.getStringCellValue(row, 25));
-        // 详情
-        posTerminal.setTerminalDesc(ExcelUtils.getStringCellValue(row, 26));
-
-
+        terTerminal.setMachineType(ExcelUtils.getStringCellValue(row, 16));
+        // 装机人
+        terTerminal.setInstallPerson(ExcelUtils.getStringCellValue(row, 23));
+        // 通讯卡号
+        terTerminal.setCommCardNum(ExcelUtils.getStringCellValue(row, 24));
+        // 备注
+        terTerminal.setTerminalRemarks(ExcelUtils.getStringCellValue(row, 25));
+        // 商户号
+        terTerminal.setMerchantNum(ExcelUtils.getStringCellValue(row, 3));
+        // 商户ID
+        terTerminal.setMerchantId(ExcelUtils.getStringCellValue(row, 3));
     }
+
 
     /**
      * 根据终端id查找帐单数据

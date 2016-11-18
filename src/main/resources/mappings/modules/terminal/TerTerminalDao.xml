@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vanroid.dachuang.modules.terminal.dao.TerTerminalDao">
+
+    <sql id="terTerminalColumns">
+		a.id AS "id",
+		a.down_date AS "downDate",
+		a.terminal_num AS "terminalNum",
+		a.device_type AS "deviceType",
+		a.device_num AS "deviceNum",
+		a.install_phone AS "installPhone",
+		a.machine_type AS "machineType",
+		a.install_person AS "installPerson",
+		a.comm_card_num AS "commCardNum",
+		a.terminal_remarks AS "terminalRemarks",
+		a.merchant_num AS "merchantNum",
+		a.merchant_id AS "merchantId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+    <sql id="terTerminalJoins">
+    </sql>
+
+    <select id="get" resultType="TerTerminal">
+        SELECT
+        <include refid="terTerminalColumns"/>
+        FROM ter_terminal a
+        <include refid="terTerminalJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TerTerminal">
+        SELECT
+        <include refid="terTerminalColumns"/>
+        FROM ter_terminal a
+        <include refid="terTerminalJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="terminalNum != null and terminalNum != ''">
+                AND a.terminal_num = #{terminalNum}
+            </if>
+            <if test="merchantNum != null and merchantNum != ''">
+                AND a.merchant_num = #{merchantNum}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="TerTerminal">
+        SELECT
+        <include refid="terTerminalColumns"/>
+        FROM ter_terminal a
+        <include refid="terTerminalJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO ter_terminal(
+			id,
+			down_date,
+			terminal_num,
+			device_type,
+			device_num,
+			install_phone,
+			machine_type,
+			install_person,
+			comm_card_num,
+			terminal_remarks,
+			merchant_num,
+			merchant_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{downDate},
+			#{terminalNum},
+			#{deviceType},
+			#{deviceNum},
+			#{installPhone},
+			#{machineType},
+			#{installPerson},
+			#{commCardNum},
+			#{terminalRemarks},
+			#{merchantNum},
+			#{merchantId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE ter_terminal SET 	
+			down_date = #{downDate},
+			terminal_num = #{terminalNum},
+			device_type = #{deviceType},
+			device_num = #{deviceNum},
+			install_phone = #{installPhone},
+			machine_type = #{machineType},
+			install_person = #{installPerson},
+			comm_card_num = #{commCardNum},
+			terminal_remarks = #{terminalRemarks},
+			merchant_num = #{merchantNum},
+			merchant_id = #{merchantId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		UPDATE ter_terminal SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+    <insert id="batchInsert">
+        INSERT INTO ter_terminal(
+        id,
+        down_date,
+        terminal_num,
+        device_type,
+        device_num,
+        install_phone,
+        machine_type,
+        install_person,
+        comm_card_num,
+        terminal_remarks,
+        merchant_num,
+        merchant_id,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        ) VALUES
+        <foreach collection="list" item="ter" separator=",">
+            (
+            #{ter.id},
+            #{ter.downDate},
+            #{ter.terminalNum},
+            #{ter.deviceType},
+            #{ter.deviceNum},
+            #{ter.installPhone},
+            #{ter.machineType},
+            #{ter.installPerson},
+            #{ter.commCardNum},
+            #{ter.terminalRemarks},
+            #{ter.merchantNum},
+            #{ter.merchantId},
+            #{ter.createBy.id},
+            #{ter.createDate},
+            #{ter.updateBy.id},
+            #{ter.updateDate},
+            #{ter.remarks},
+            #{ter.delFlag}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findTerNumList" resultType="String">
+		SELECT terminal_num FROM ter_terminal
+	</select>
+</mapper>

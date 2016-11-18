@@ -51,6 +51,32 @@ CREATE TABLE ter_pos_terminal
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = 'POS终端设备表';
 
+-- 下机日期   终端号 机型号 机身号 装机电话  机具类型 装机人 通讯卡号 备注
+CREATE TABLE ter_terminal
+(
+	id varchar(64) NOT NULL COMMENT '编号，使用终端号',
+
+	down_date DATE COMMENT '下机日期',
+	terminal_num VARCHAR(20) NOT NULL COMMENT '终端号',
+	device_type VARCHAR(20) COMMENT '机型号',
+	device_num VARCHAR(25) COMMENT '机身号',
+	install_phone VARCHAR(18) COMMENT '装机电话',
+	machine_type VARCHAR(20) COMMENT '机具类型',
+	install_person VARCHAR(10) COMMENT '装机人',
+	comm_card_num VARCHAR(100) COMMENT '通讯卡号',
+	terminal_remarks TEXT COMMENT '备注',
+	merchant_num VARCHAR(20) NOT NULL COMMENT '商户号',
+	merchant_id VARCHAR(64) NOT NULL COMMENT '商户ID',
+
+	create_by varchar(64) NOT NULL COMMENT '创建者',
+	create_date datetime NOT NULL COMMENT '创建时间',
+	update_by varchar(64) NOT NULL COMMENT '更新者',
+	update_date datetime NOT NULL COMMENT '更新时间',
+	remarks varchar(255) COMMENT '备注信息',
+	del_flag char(1) DEFAULT '0' NOT NULL COMMENT '删除标记',
+	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT = '终端设备表';
+
 
 CREATE TABLE ter_merchant
 (

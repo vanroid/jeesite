@@ -48,7 +48,7 @@ public class TerminalServiceTest extends BaseTest {
     @Test
     public void testImport() {
         clearTest();
-        terminalService.importTerminals("/home/cgz/win7vm/大创商户详情表161117.xlsx");
+        terminalService.importTerminals("/home/cgz/win7vm/大创商户详情表161118.xlsx");
     }
 
     // 清除上一次测试数据，使测试可以回归

@@ -3,13 +3,11 @@
  */
 package com.vanroid.dachuang.modules.merchant.entity;
 
-import com.sun.beans.editors.IntegerEditor;
-import org.hibernate.validator.constraints.Length;
+import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.modules.sys.entity.Office;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
-
-import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
  * 商户管理Entity
