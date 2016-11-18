@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao">
-    
-	<sql id="terMerchantColumns">
+
+    <sql id="terMerchantColumns">
 		a.id AS "id",
 		a.merchant_num AS "merchantNum",
 		a.wechat_url AS "wechatUrl",
@@ -29,71 +29,71 @@
 		a.del_flag AS "delFlag",
 		o18.name AS "office.name"
 	</sql>
-	
-	<sql id="terMerchantJoins">
+
+    <sql id="terMerchantJoins">
 		LEFT JOIN sys_office o18 ON o18.id = a.office_id
 	</sql>
-    
-	<select id="get" resultType="TerMerchant">
-		SELECT 
-			<include refid="terMerchantColumns"/>
-		FROM ter_merchant a
-		<include refid="terMerchantJoins"/>
-		WHERE a.id = #{id}
-	</select>
-	
-	<select id="findList" resultType="TerMerchant">
-		SELECT 
-			<include refid="terMerchantColumns"/>
-		FROM ter_merchant a
-		<include refid="terMerchantJoins"/>
-		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
-			<if test="merchantNum != null and merchantNum != ''">
-				AND a.merchant_num = #{merchantNum}
-			</if>
-			<if test="merchantName != null and merchantName != ''">
-				AND a.merchant_name LIKE 
-					<if test="dbName == 'oracle'">'%'||#{merchantName}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{merchantName}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
-			</if>
-			<if test="telphone != null and telphone != ''">
-				AND a.telphone = #{telphone}
-			</if>
-			<if test="salesman != null and salesman != ''">
-				AND a.salesman = #{salesman}
-			</if>
-		</where>
-		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy}
-			</when>
-			<otherwise>
-				ORDER BY a.update_date DESC
-			</otherwise>
-		</choose>
-	</select>
-	
-	<select id="findAllList" resultType="TerMerchant">
-		SELECT 
-			<include refid="terMerchantColumns"/>
-		FROM ter_merchant a
-		<include refid="terMerchantJoins"/>
-		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
-		</where>		
-		<choose>
-			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
-				ORDER BY ${page.orderBy}
-			</when>
-			<otherwise>
-				ORDER BY a.update_date DESC
-			</otherwise>
-		</choose>
-	</select>
-	
-	<insert id="insert">
+
+    <select id="get" resultType="TerMerchant">
+        SELECT
+        <include refid="terMerchantColumns"/>
+        FROM ter_merchant a
+        <include refid="terMerchantJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TerMerchant">
+        SELECT
+        <include refid="terMerchantColumns"/>
+        FROM ter_merchant a
+        <include refid="terMerchantJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="merchantNum != null and merchantNum != ''">
+                AND a.merchant_num = #{merchantNum}
+            </if>
+            <if test="merchantName != null and merchantName != ''">
+                AND a.merchant_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{merchantName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{merchantName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
+            </if>
+            <if test="telphone != null and telphone != ''">
+                AND a.telphone = #{telphone}
+            </if>
+            <if test="salesman != null and salesman != ''">
+                AND a.salesman = #{salesman}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="TerMerchant">
+        SELECT
+        <include refid="terMerchantColumns"/>
+        FROM ter_merchant a
+        <include refid="terMerchantJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
 		INSERT INTO ter_merchant(
 			id,
 			merchant_num,
@@ -146,8 +146,8 @@
 			#{delFlag}
 		)
 	</insert>
-	
-	<update id="update">
+
+    <update id="update">
 		UPDATE ter_merchant SET 	
 			merchant_num = #{merchantNum},
 			wechat_url = #{wechatUrl},
@@ -171,14 +171,22 @@
 			remarks = #{remarks}
 		WHERE id = #{id}
 	</update>
-	
-	<update id="delete">
+
+    <update id="delete">
 		UPDATE ter_merchant SET 
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
 
-	<select id="findMerchantNumList" resultType="String">
+    <select id="findMerchantNumList" resultType="String">
 		SELECT merchant_num from ter_merchant
+	</select>
+
+    <select id="findMerchantNumListByOffice" resultType="String">
+		SELECT merchant_num from ter_merchant m
+		 INNER JOIN sys_office o
+		 ON m.office_id = o.id
+		WHERE m.del_flag = #{DEL_FLAG_DELETE} and o.del_flag = #{DEL_FLAG_DELETE}
+		and (o.parent_ids LIKE '${parentIds}${id}%' or o.id = #{id})
 	</select>
 </mapper>

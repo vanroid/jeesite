@@ -128,6 +128,7 @@ CREATE TABLE ter_bill_day
   merchant_name VARCHAR(100) COMMENT '商户名称',
   debit_fee DOUBLE COMMENT '商户借记手续费',
   credit_fee DOUBLE COMMENT '商户贷记手续费',
+  card_type VARCHAR(10) COMMENT '卡类型',
 
 	create_by varchar(64) NOT NULL COMMENT '创建者',
 	create_date datetime NOT NULL COMMENT '创建时间',

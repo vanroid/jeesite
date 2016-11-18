@@ -29,7 +29,7 @@
             $("#btnImport").click(function () {
                 $.jBox($("#importBox").html(), {
                     title: "导入数据", buttons: {"关闭": true},
-                    bottomText: "导入文件不能超过5M，仅允许导入“xls”或“xlsx”格式文件！"
+                    bottomText: "导入文件不能超过5M，月帐单仅允许导入“csv”格式文件！"
                 });
             });
         });
@@ -37,26 +37,6 @@
     <style>
         .merchant-name {
             min-width: 210px;
-        }
-
-        .person-name {
-            min-width: 40px;
-        }
-
-        .debit-rate {
-            min-width: 80px;
-        }
-
-        .address {
-            min-width: 180px;
-        }
-
-        .salesman {
-            min-width: 80px;
-        }
-
-        .action {
-            min-width: 100px;
         }
 
     </style>

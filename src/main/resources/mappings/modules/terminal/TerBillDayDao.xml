@@ -17,6 +17,7 @@
 		a.merchant_name AS "merchantName",
 		a.debit_fee AS "debitFee",
 		a.credit_fee AS "creditFee",
+		a.card_type AS "cardType",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
@@ -41,6 +42,10 @@
 			<include refid="terBillDayColumns"/>
 		FROM ter_bill_day a
 		<include refid="terBillDayJoins"/>
+		INNER JOIN ter_merchant m
+		ON a.merchant_num = m.merchant_num
+		INNER JOIN sys_office o
+		ON o.id = m.office_id
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			<if test="beginClearDate != null and endClearDate != null and beginClearDate != '' and endClearDate != ''">
@@ -59,6 +64,7 @@
 					<if test="dbName == 'mysql'">concat('%',#{merchantName},'%')</if>
 			</if>
 		</where>
+		${sqlMap.dsf}
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -103,6 +109,7 @@
 			merchant_name,
 			debit_fee,
 			credit_fee,
+			card_type,
 			create_by,
 			create_date,
 			update_by,
@@ -124,6 +131,7 @@
 			#{merchantName},
 			#{debitFee},
 			#{creditFee},
+			#{cardType},
 			#{createBy.id},
 			#{createDate},
 			#{updateBy.id},
@@ -176,6 +184,7 @@
 		merchant_name,
 		debit_fee,
 		credit_fee,
+		card_type,
 		create_by,
 		create_date,
 		update_by,
@@ -199,6 +208,7 @@
 		#{bill.merchantName},
 		#{bill.debitFee},
 		#{bill.creditFee},
+		#{bill.cardType},
 		#{bill.createBy.id},
 		#{bill.createDate},
 		#{bill.updateBy.id},
@@ -262,6 +272,44 @@
 		</choose>
 		limit ${(bill.page.pageNo-1)*bill.page.pageSize},${bill.page.pageSize}
 	</select>
+
+	<select id="findListByMerchantNums" resultType="TerBillDay">
+		SELECT
+		<include refid="terBillDayColumns"/>
+		FROM ter_bill_day a
+		INNER JOIN ter_pos_terminal b
+		ON a.terminal_num = b.terminal_num
+		<include refid="terBillDayJoins"/>
+		<where>
+			a.del_flag = #{bill.DEL_FLAG_NORMAL}
+			<if test="beginClearDate != null and endClearDate != null and beginClearDate != '' and endClearDate != ''">
+				AND a.clear_date BETWEEN #{bill.beginClearDate} AND #{bill.endClearDate}
+			</if>
+			<if test="terminalNum != null and terminalNum != ''">
+				AND a.terminal_num = #{bill.terminalNum}
+			</if>
+			<if test="merchantNum != null and merchantNum != ''">
+				AND a.merchant_num = #{bill.merchantNum}
+			</if>
+			<if test="merchantName != null and merchantName != ''">
+				AND a.merchant_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{bill.merchantName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{bill.merchantName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{bill.merchantName},'%')</if>
+			</if>
+		</where>
+		${sqlMap.dsf}
+		<choose>
+			<when test="bill.page !=null and bill.page.orderBy != null and bill.page.orderBy != ''">
+				ORDER BY ${bill.page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+
+	</select>
+
 
 	<delete id="deleteByClearDate" parameterType="Date">
 		delete from ter_bill_day where clear_date = #{clearDate}

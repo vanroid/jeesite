@@ -4,6 +4,8 @@
 package com.vanroid.dachuang.modules.terminal.service;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +25,11 @@ import com.thinkgem.jeesite.modules.sys.service.SystemService;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.vanroid.dachuang.common.ExcelUtils;
 import com.vanroid.dachuang.common.StatusConstants;
+import com.vanroid.dachuang.common.csv.ImportCSV;
+import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
+import com.vanroid.dachuang.modules.merchant.service.TerMerchantService;
 import com.vanroid.dachuang.modules.terminal.entity.PosTerminal;
+import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
@@ -49,7 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
 
     @Autowired
-    private PosTerminalService posTerminalService;
+    private TerMerchantService terMerchantService;
 
 
     public TerBillDay get(String id) {
@@ -67,16 +73,16 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
     public Page<TerBillDay> findPageByUser(Page<TerBillDay> page, TerBillDay terBillDay) {
 
         terBillDay.setPage(page);
-        // 1.查找当前用户所有的terminalId
-        List<String> terIds = posTerminalService.findIdsByUser();
-        // 2.关联terminal与bill查询
-        int rowCnt = dao.countByTerIds(terIds);
+        // 1.查找当前用户所有的商户号
+        List<String> merchantNums = terMerchantService.findMerchantNumsByUser();
+        // 2.关联merchant与bill查询
+        int rowCnt = dao.countByMerchantNums(merchantNums);
         logger.debug("找到所属用户{}帐单记录数：{}", UserUtils.getUser().getName(), rowCnt);
         page.setCount(rowCnt);
         Map params = Maps.newHashMap();
         params.put("bill", terBillDay);
-        params.put("list", terIds);
-        params.put("dbName",terBillDay.getDbName());
+        //params.put("list", terIds);
+        params.put("dbName", terBillDay.getDbName());
         page.setList(dao.findListByTerIds(params));
         return page;
     }
@@ -216,4 +222,44 @@ public class TerBillDayService extends CrudService<TerBillDayDao, TerBillDay> {
     }
 
 
+    /**
+     * 导入CSV日数据
+     *
+     * @param file
+     * @return
+     */
+    @Transactional(readOnly = false)
+    public Map<String, Object> importBillDaysCSV(MultipartFile file) throws InstantiationException, IllegalAccessException, IOException {
+        String fileName = file.getOriginalFilename();
+        if (org.apache.commons.lang3.StringUtils.isBlank(fileName)) {
+            throw new RuntimeException("导入文档为空!");
+        } else if (fileName.toLowerCase().endsWith("csv")) {
+        } else {
+            throw new RuntimeException("文档格式不正确!");
+        }
+        InputStreamReader reader = new InputStreamReader(file.getInputStream(), Charset.forName("GBK"));
+
+        List<TerBillDay> datas = new ImportCSV(reader, 1).getDataList(TerBillDay.class);
+
+        String clrDate = DateUtils.formatDate(datas.get(0).getClearDate(), "yyyyMM");
+
+        logger.debug("检测到{}日共{}条日帐单", clrDate, datas.size());
+        // batch save
+        dao.deleteByClearDate(datas.get(0).getClearDate());
+
+        int rstCnt = batchSave(datas);
+        Map resultMap = Maps.newHashMap();
+        StringBuilder sb = new StringBuilder("成功导入");
+        sb.append(rstCnt);
+        sb.append("条记录");
+        resultMap.put("message", sb.toString());
+        return resultMap;
+    }
+
+    private int batchSave(List<TerBillDay> datas) {
+        for (TerBillDay terBillDay : datas) {
+            terBillDay.preInsert();
+        }
+        return dao.batchInsert(datas);
+    }
 }

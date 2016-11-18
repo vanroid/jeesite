@@ -60,13 +60,13 @@ public abstract class BaseService {
 							// 包括本公司下的部门 （type=1:公司；type=2：部门）
 							sqlString.append(" OR (" + oa + ".parent_id = '" + user.getCompany().getId() + "' AND " + oa + ".type = '2')");
 						}
-						/*else if (Role.DATA_SCOPE_OFFICE_AND_CHILD.equals(r.getDataScope())){
+						else if (Role.DATA_SCOPE_OFFICE_AND_CHILD.equals(r.getDataScope())){
 							sqlString.append(" OR " + oa + ".id = '" + user.getOffice().getId() + "'");
 							sqlString.append(" OR " + oa + ".parent_ids LIKE '" + user.getOffice().getParentIds() + user.getOffice().getId() + ",%'");
 						}
 						else if (Role.DATA_SCOPE_OFFICE.equals(r.getDataScope())){
 							sqlString.append(" OR " + oa + ".id = '" + user.getOffice().getId() + "'");
-						}*/
+						}
 						else if (Role.DATA_SCOPE_CUSTOM.equals(r.getDataScope())){
 //							String officeIds =  StringUtils.join(r.getOfficeIdList(), "','");
 //							if (StringUtils.isNotEmpty(officeIds)){

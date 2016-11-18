@@ -40,4 +40,6 @@ public interface TerBillDayDao extends CrudDao<TerBillDay> {
      * @return
      */
     int deleteByClearDate(Date clearDate);
+
+    int countByMerchantNums(List<String> merchantNums);
 }
