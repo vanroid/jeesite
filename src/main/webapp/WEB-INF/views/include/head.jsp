@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta http-equiv="Cache-Control" content="no-store">
 <script src="${ctxStatic}/jquery/jquery-1.8.3.min.js" type="text/javascript"></script>
-<link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/static/images/favicon.png"/>
+<link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/static/images/favicon32.png"/>
 <link href="${ctxStatic}/bootstrap/2.3.1/css_${not empty cookie.theme.value ? cookie.theme.value : 'cerulean'}/bootstrap.min.css"
       type="text/css" rel="stylesheet"/>
 <script src="${ctxStatic}/bootstrap/2.3.1/js/bootstrap.min.js" type="text/javascript"></script>
