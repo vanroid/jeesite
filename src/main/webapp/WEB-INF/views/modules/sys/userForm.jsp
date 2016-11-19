@@ -40,36 +40,36 @@
 	<form:form id="inputForm" modelAttribute="user" action="${ctx}/sys/user/save" method="post" class="form-horizontal">
 		<form:hidden path="id"/>
 		<sys:message content="${message}"/>
-		<div class="control-group">
+		<%--<div class="control-group">
 			<label class="control-label">头像:</label>
 			<div class="controls">
 				<form:hidden id="nameImage" path="photo" htmlEscape="false" maxlength="255" class="input-xlarge"/>
 				<sys:ckfinder input="nameImage" type="images" uploadPath="/photo" selectMultiple="false" maxWidth="100" maxHeight="100"/>
 			</div>
-		</div>
+		</div>--%>
 		<div class="control-group">
-			<label class="control-label">归属公司:</label>
+			<label class="control-label">归属机构:</label>
 			<div class="controls">
                 <sys:treeselect id="company" name="company.id" value="${user.company.id}" labelName="company.name" labelValue="${user.company.name}"
 					title="公司" url="/sys/office/treeData?type=1" cssClass="required"/>
 			</div>
 		</div>
-		<div class="control-group">
+		<%--<div class="control-group">
 			<label class="control-label">归属部门:</label>
 			<div class="controls">
-                <%--<sys:treeselect id="office" name="office.id" value="${user.office.id}" labelName="office.name" labelValue="${user.office.name}"
-					title="部门" url="/sys/office/treeData?type=2" cssClass="required" notAllowSelectParent="true" disabled="true"/>--%>
+                &lt;%&ndash;<sys:treeselect id="office" name="office.id" value="${user.office.id}" labelName="office.name" labelValue="${user.office.name}"
+					title="部门" url="/sys/office/treeData?type=2" cssClass="required" notAllowSelectParent="true" disabled="true"/>&ndash;%&gt;
 				<input type="hidden" name="office.id" value="-1">
 				<input type="text" name="office.name" disabled="disabled" value="总部">
 			</div>
-		</div>
-		<div class="control-group">
+		</div>--%>
+		<%--<div class="control-group">
 			<label class="control-label">工号:</label>
 			<div class="controls">
 				<form:input path="no" htmlEscape="false" maxlength="50" class="required"/>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
-		</div>
+		</div>--%>
 		<div class="control-group">
 			<label class="control-label">姓名:</label>
 			<div class="controls">
@@ -112,12 +112,12 @@
 				<form:input path="phone" htmlEscape="false" maxlength="100"/>
 			</div>
 		</div>
-		<div class="control-group">
+		<%--<div class="control-group">
 			<label class="control-label">手机:</label>
 			<div class="controls">
 				<form:input path="mobile" htmlEscape="false" maxlength="100"/>
 			</div>
-		</div>
+		</div>--%>
 		<div class="control-group">
 			<label class="control-label">是否允许登录:</label>
 			<div class="controls">

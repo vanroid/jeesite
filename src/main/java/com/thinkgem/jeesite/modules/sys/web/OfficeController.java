@@ -103,9 +103,10 @@ public class OfficeController extends BaseController {
             addMessage(redirectAttributes, "演示模式，不允许操作！");
             return "redirect:" + adminPath + "/sys/office/";
         }
-        if (!beanValidator(model, office)) {
+        // cgz 删除机构较验
+        /*if (!beanValidator(model, office)) {
             return form(office, model);
-        }
+        }*/
 
         officeService.save(office);
 

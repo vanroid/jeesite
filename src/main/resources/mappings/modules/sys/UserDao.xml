@@ -201,7 +201,8 @@
 			a.id, a.name, a.login_name
 		FROM sys_user a
 		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
-			AND a.office_id = #{office.id}
+		<!--传入的office.id 可以为公司或部门的-->
+			AND (a.office_id = #{office.id} OR a.company_id = #{office.id})
 		ORDER BY a.name
 	</select>
 	
