@@ -57,7 +57,7 @@ public class OfficeController extends BaseController {
     public String index(Office office, Model model) {
         Office company = UserUtils.getUser().getCompany();
         model.addAttribute("officeId", company.getId());
-        logger.debug("公司ID：{}",company.getName());
+        logger.debug("公司ID：{}", company.getName());
         return "modules/sys/officeIndex";
     }
 
@@ -108,6 +108,8 @@ public class OfficeController extends BaseController {
             return form(office, model);
         }*/
 
+        // 默认为公司类型
+        office.setType("1");
         officeService.save(office);
 
         if (office.getChildDeptList() != null) {
