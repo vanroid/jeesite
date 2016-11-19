@@ -51,7 +51,7 @@
 					value="<fmt:formatDate value="${testData.endInDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
 			</li>
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="btns"><button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button></li>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>

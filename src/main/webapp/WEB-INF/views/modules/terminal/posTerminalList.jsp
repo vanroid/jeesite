@@ -106,7 +106,7 @@
                         <form:input path="bankCard" htmlEscape="false" maxlength="100" class="input-medium"/>
                     </li>--%>
 
-                    <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+                    <li class="btns"><button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
                         <input id="btnExport" class="btn btn-primary" type="button" value="导出"/>
                         <input id="btnImport" class="btn btn-primary" type="button" value="导入"/></li>
                     <li class="clearfix"></li>

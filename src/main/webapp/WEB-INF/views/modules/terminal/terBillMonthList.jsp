@@ -76,10 +76,10 @@
                     <li><label>维护公司：</label>
                         <form:input path="maintenanceCompany" htmlEscape="false" maxlength="10" class="input-medium"/>
                     </li>
-                    <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+                    <li class="btns"><button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
                         <shiro:hasRole name="employee">
-                            <input id="btnExport" class="btn btn-primary" type="button" value="导出"/>
-                            <input id="btnImport" class="btn btn-primary" type="button" value="导入"/></shiro:hasRole>
+                            <button id="btnExport" class="btn btn-primary" type="button"><i class="icon-cloud-download"></i>导出</button>
+                            <button id="btnImport" class="btn btn-primary" type="button"><i class="icon-cloud-upload"></i>导入</button></shiro:hasRole>
                     </li>
                     <li class="clearfix"></li>
                 </ul>

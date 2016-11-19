@@ -44,7 +44,7 @@
 				<option value="${dict.value}" ${dict.value==category?'selected':''}>${dict.label}</option>
 			</c:forEach>
 		</select>
-		&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+		&nbsp;<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
 	</form>
 	<sys:message content="${message}"/>
 	<table class="table table-striped table-bordered table-condensed table-nowrap">

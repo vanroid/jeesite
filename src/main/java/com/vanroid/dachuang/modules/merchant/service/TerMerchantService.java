@@ -6,9 +6,14 @@ package com.vanroid.dachuang.modules.merchant.service;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.sun.tools.corba.se.idl.constExpr.Terminal;
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.service.BaseService;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import com.vanroid.dachuang.modules.terminal.dao.PosTerminalDao;
+import com.vanroid.dachuang.modules.terminal.dao.TerTerminalDao;
+import com.vanroid.dachuang.modules.terminal.entity.TerTerminal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +34,14 @@ import com.vanroid.dachuang.modules.merchant.dao.TerMerchantDao;
 @Transactional(readOnly = true)
 public class TerMerchantService extends CrudService<TerMerchantDao, TerMerchant> {
 
+    @Autowired
+    private TerTerminalDao terTerminalDao;
 
     public TerMerchant get(String id) {
-        TerMerchant terMerchant = super.get(id);
+        TerMerchant terMerchant = new TerMerchant();
+        terMerchant.setId(id);
+        terMerchant.getSqlMap().put("dsf", BaseService.dataScopeFilter(terMerchant.getCurrentUser(), "o", ""));
+        terMerchant = super.get(terMerchant);
         return terMerchant;
     }
 
@@ -40,6 +50,7 @@ public class TerMerchantService extends CrudService<TerMerchantDao, TerMerchant>
     }
 
     public Page<TerMerchant> findPage(Page<TerMerchant> page, TerMerchant terMerchant) {
+        terMerchant.getSqlMap().put("dsf", BaseService.dataScopeFilter(terMerchant.getCurrentUser(), "o", ""));
         return super.findPage(page, terMerchant);
     }
 
@@ -66,5 +77,11 @@ public class TerMerchantService extends CrudService<TerMerchantDao, TerMerchant>
     @Transactional
     private List<String> findMerchantNumsByUser(User user) {
         return dao.findMerchantNumListByOffice(user.getCompany());
+    }
+
+    @Transactional
+    public List<TerTerminal> findTerminalList(TerMerchant terMerchant) {
+        terMerchant.getSqlMap().put("dsf", BaseService.dataScopeFilter(terMerchant.getCurrentUser(), "o", ""));
+        return terTerminalDao.findListByMerchant(terMerchant);
     }
 }

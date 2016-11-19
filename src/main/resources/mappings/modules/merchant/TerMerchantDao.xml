@@ -38,14 +38,19 @@
         SELECT
         <include refid="terMerchantColumns"/>
         FROM ter_merchant a
+		INNER JOIN sys_office o
+		ON o.id = a.office_id
         <include refid="terMerchantJoins"/>
         WHERE a.id = #{id}
+		${sqlMap.dsf}
     </select>
 
     <select id="findList" resultType="TerMerchant">
         SELECT
         <include refid="terMerchantColumns"/>
         FROM ter_merchant a
+		INNER JOIN sys_office o
+		ON o.id = a.office_id
         <include refid="terMerchantJoins"/>
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
@@ -65,6 +70,7 @@
                 AND a.salesman = #{salesman}
             </if>
         </where>
+		${sqlMap.dsf}
         <choose>
             <when test="page !=null and page.orderBy != null and page.orderBy != ''">
                 ORDER BY ${page.orderBy}

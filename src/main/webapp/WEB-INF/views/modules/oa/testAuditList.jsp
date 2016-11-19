@@ -26,7 +26,7 @@
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<label>姓名：</label><sys:treeselect id="user" name="user.id" value="${testAudit.user.id}" labelName="user.name" labelValue="${testAudit.user.name}" 
 			title="用户" url="/sys/office/treeData?type=3" cssStyle="width:150px" allowClear="true" notAllowSelectParent="true"/>
-		&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+		&nbsp;<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
 	</form:form>
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">

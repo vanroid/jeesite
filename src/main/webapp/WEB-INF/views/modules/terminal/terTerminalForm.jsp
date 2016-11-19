@@ -27,7 +27,7 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/terminal/terTerminal/">终端信息列表</a></li>
+		<%--<li><a href="${ctx}/merchant/terMerchant/terminal/view?id=${terMerchant.id}">终端信息列表</a></li>--%>
 		<li class="active"><a href="${ctx}/terminal/terTerminal/form?id=${terTerminal.id}">终端信息<shiro:hasPermission name="terminal:terTerminal:edit">${not empty terTerminal.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="terminal:terTerminal:edit">查看</shiro:lacksPermission></a></li>
 	</ul><br/>
 	<form:form id="inputForm" modelAttribute="terTerminal" action="${ctx}/terminal/terTerminal/save" method="post" class="form-horizontal">

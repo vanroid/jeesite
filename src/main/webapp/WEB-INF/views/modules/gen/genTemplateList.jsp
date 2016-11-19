@@ -29,7 +29,7 @@
 			<form:options items="${fns:getDictList('gen_category')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 		</form:select>
 		<label>名称 ：</label><form:input path="name" htmlEscape="false" maxlength="50" class="input-medium"/>
-		&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+		&nbsp;<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
 	</form:form>
 	<div id="messageBoxError" class="alert alert-error"><button data-dismiss="alert" class="close">×</button>
 		代码模板管理，已废弃！模板管理改为XML配置方式，见  /src/main/java/com/thinkgem/jeesite/modules/gen/template 文件夹

@@ -40,7 +40,7 @@
 	<form id="searchForm" action="${ctx}/act/process/running/" method="post" class="breadcrumb form-search">
 		<label>流程实例ID：</label><input type="text" id="procInsId" name="procInsId" value="${procInsId}" class="input-medium"/>
 		<label>流程定义Key：</label><input type="text" id="procDefKey" name="procDefKey" value="${procDefKey}" class="input-medium"/>
-		&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+		&nbsp;<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
 	</form>
 	<sys:message content="${message}"/>
 	<table class="table table-striped table-bordered table-condensed">

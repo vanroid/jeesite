@@ -28,7 +28,7 @@
 		<label>表名：</label><form:input path="nameLike" htmlEscape="false" maxlength="50" class="input-medium"/>
 		<label>说明：</label><form:input path="comments" htmlEscape="false" maxlength="50" class="input-medium"/>
 		<label>父表表名：</label><form:input path="parentTable" htmlEscape="false" maxlength="50" class="input-medium"/>
-		&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+		&nbsp;<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
 	</form:form>
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">

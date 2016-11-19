@@ -71,7 +71,8 @@
                     <li><label>业务员：</label>
                         <form:input path="salesman" htmlEscape="false" maxlength="20" class="input-medium"/>
                     </li>
-                    <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+
+                    <li class="btns"><button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button></li>
                     <li class="clearfix"></li>
                 </ul>
             </form:form>
@@ -152,7 +153,7 @@
                        href="${ctx}/merchant/terMerchant/form?id=${terMerchant.id}"><i class="fa fa-cog"></i></a>
                     <a title="删除" class="btn btn-danger btn-sm"
                        href="${ctx}/merchant/terMerchant/delete?id=${terMerchant.id}"
-                       onclick="return confirmx('确认要删除该商户吗？', this.href)"><i class="fa fa-trash-o fa-lg"></i</a>
+                       onclick="return confirmx('确认要删除该商户吗？', this.href)"><i class="fa fa-trash-o fa-lg"></i></a>
                 </td>
             </shiro:hasPermission>
         </tr>

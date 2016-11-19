@@ -34,7 +34,7 @@
 			<input id="createDateEnd" name="createDateEnd" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate" style="width:163px;"
 				value="<fmt:formatDate value="${leave.createDateEnd}" pattern="yyyy-MM-dd"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd'});"/>
-			&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>
+			&nbsp;<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>
 		</div>
 	</form:form>
 	<sys:message content="${message}"/>

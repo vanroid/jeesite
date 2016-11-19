@@ -29,6 +29,7 @@
 <ul class="nav nav-tabs">
     <li class=""><a href="${ctx}/merchant/terMerchant/list">商户列表</a></li>
     <li class="active"><a href="${ctx}/merchant/terMerchant/view?id=${terMerchant.id}">商户详情</a></li>
+    <li class=""><a href="${ctx}/merchant/terMerchant/terminal/view?id=${terMerchant.id}">终端信息</a></li>
 </ul>
 <br/>
 <form id="inputForm" modelAttribute="terMerchant" class="container">

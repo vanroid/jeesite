@@ -5,12 +5,14 @@ package com.vanroid.dachuang.modules.terminal.dao;
 
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
+import com.vanroid.dachuang.modules.merchant.entity.TerMerchant;
 import com.vanroid.dachuang.modules.terminal.entity.TerTerminal;
 
 import java.util.List;
 
 /**
  * 终端信息DAO接口
+ *
  * @author CGZ
  * @version 2016-11-17
  */
@@ -20,4 +22,12 @@ public interface TerTerminalDao extends CrudDao<TerTerminal> {
     int batchInsert(List<TerTerminal> terTerminals);
 
     List<String> findTerNumList();
+
+    /**
+     * 查找商户下的所有终端
+     *
+     * @param terMerchant
+     * @return
+     */
+    List<TerTerminal> findListByMerchant(TerMerchant terMerchant);
 }

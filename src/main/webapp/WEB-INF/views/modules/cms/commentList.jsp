@@ -32,7 +32,7 @@
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<label>文档标题：</label><form:input path="title" htmlEscape="false" maxlength="50" class="input-small"/>&nbsp;
-		<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>&nbsp;&nbsp;
+		<button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button>&nbsp;&nbsp;
 		<label>状态：</label><form:radiobuttons onclick="$('#searchForm').submit();" path="delFlag" items="${fns:getDictList('cms_del_flag')}" itemLabel="label" itemValue="value" htmlEscape="false" />
 	</form:form>
 	<sys:message content="${message}"/>

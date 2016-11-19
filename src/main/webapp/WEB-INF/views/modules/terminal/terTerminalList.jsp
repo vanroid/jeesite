@@ -31,7 +31,7 @@
 			<li><label>商户号：</label>
 				<form:input path="merchantNum" htmlEscape="false" maxlength="20" class="input-medium"/>
 			</li>
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="btns"><button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button></li>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>

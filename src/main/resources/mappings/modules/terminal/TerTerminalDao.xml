@@ -191,4 +191,28 @@
     <select id="findTerNumList" resultType="String">
 		SELECT terminal_num FROM ter_terminal
 	</select>
+
+    <select id="findListByMerchant" resultType="TerTerminal">
+        SELECT
+        <include refid="terTerminalColumns"/>
+        FROM ter_terminal a
+        INNER JOIN ter_merchant m
+        ON a.merchant_num = m.merchant_num
+        INNER JOIN sys_office o
+        ON o.id = m.office_id
+        <include refid="terTerminalJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.merchant_id = #{id}
+        </where>
+        ${sqlMap.dsf}
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
 </mapper>

@@ -37,7 +37,7 @@
 			<c:if test="${!requestScope.oaNotify.self}"><li><label>状态：</label>
 				<form:radiobuttons path="status" items="${fns:getDictList('oa_notify_status')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 			</li></c:if>
-			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="btns"><button id="btnSubmit" class="btn btn-primary" type="submit"><i class="icon-search"></i>查询</button></li>
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
