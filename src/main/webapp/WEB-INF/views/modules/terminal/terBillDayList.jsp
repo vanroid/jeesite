@@ -11,6 +11,7 @@
         function page(n, s) {
             $("#pageNo").val(n);
             $("#pageSize").val(s);
+            $("#searchForm").attr("action","${ctx}/terminal/terBillDay/list");
             $("#searchForm").submit();
             return false;
         }
