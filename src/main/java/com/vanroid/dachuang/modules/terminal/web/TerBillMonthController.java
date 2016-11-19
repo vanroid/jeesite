@@ -3,9 +3,15 @@
  */
 package com.vanroid.dachuang.modules.terminal.web;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.service.BaseService;
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
+import com.vanroid.dachuang.modules.terminal.service.TerBillMonthService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,12 +23,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
-import com.vanroid.dachuang.modules.terminal.service.TerBillMonthService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 月帐单Controller
@@ -52,7 +56,9 @@ public class TerBillMonthController extends BaseController {
     @RequiresPermissions("terminal:terBillMonth:view")
     @RequestMapping(value = {"list", ""})
     public String list(TerBillMonth terBillMonth, HttpServletRequest request, HttpServletResponse response, Model model) {
+        terBillMonth.getSqlMap().put("dsf", BaseService.dataScopeFilter(terBillMonth.getCurrentUser(), "o", ""));
         Page<TerBillMonth> page = terBillMonthService.findPage(new Page<TerBillMonth>(request, response), terBillMonth);
+        //Page<TerBillMonth> page = terBillMonthService.findPage(new Page<TerBillMonth>(request, response), terBillMonth);
         model.addAttribute("page", page);
         return "modules/terminal/terBillMonthList";
     }
@@ -87,10 +93,28 @@ public class TerBillMonthController extends BaseController {
     @RequestMapping(value = "import", method = RequestMethod.POST)
     public String importBillMonth(MultipartFile file, RedirectAttributes redirectAttributes) {
         try {
-            terBillMonthService.importBillMonths(file);
+            Map<String, Object> result = terBillMonthService.importBillMonths(file);
+            addMessage(redirectAttributes, "导入帐单成功", result.get("message").toString());
         } catch (Exception e) {
             logger.error("导入帐单出错", e);
             addMessage(redirectAttributes, "导入帐单出错", e.getMessage());
+        }
+        return "redirect:" + Global.getAdminPath() + "/terminal/terBillMonth/?repage";
+    }
+
+    @RequiresPermissions("terminal:terBillMonth:view")
+    @RequestMapping(value = "export", method = RequestMethod.POST)
+    public String exportFile(TerBillMonth terBillMonth, HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
+        try {
+            terBillMonth.getSqlMap().put("dsf", BaseService.dataScopeFilter(terBillMonth.getCurrentUser(), "o", ""));
+
+            List<TerBillMonth> list = terBillMonthService.findList(terBillMonth);
+
+            String fileName = "月交易数据" + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
+            new ExportExcel("月交易数据", TerBillMonth.class).setDataList(list).write(response, fileName).dispose();
+            return null;
+        } catch (Exception e) {
+            addMessage(redirectAttributes, "导出帐单失败！失败信息：" + e.getMessage());
         }
         return "redirect:" + Global.getAdminPath() + "/terminal/terBillMonth/?repage";
     }

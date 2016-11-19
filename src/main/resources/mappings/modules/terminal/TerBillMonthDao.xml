@@ -46,6 +46,10 @@
 			<include refid="terBillMonthColumns"/>
 		FROM ter_bill_month a
 		<include refid="terBillMonthJoins"/>
+		INNER JOIN ter_merchant m
+		ON a.merchant_num = m.merchant_num
+		INNER JOIN sys_office o
+		ON o.id = m.office_id
 		<where>
 			
 			<if test="clearDate != null and clearDate != ''">
@@ -67,6 +71,7 @@
 				AND a.maintenance_company = #{maintenanceCompany}
 			</if>
 		</where>
+		${sqlMap.dsf}
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}

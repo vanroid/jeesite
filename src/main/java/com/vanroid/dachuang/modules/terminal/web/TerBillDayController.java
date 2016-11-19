@@ -122,8 +122,8 @@ public class TerBillDayController extends BaseController {
             /*Page<TerBillDay> page = terBillDayService.findPage(new Page<TerBillDay>(request, response, -1), terBillDay);*/
             List<TerBillDay> list = terBillDayService.findList(terBillDay);
 
-            String fileName = "交易数据" + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
-            new ExportExcel("交易数据", TerBillDay.class).setDataList(list).write(response, fileName).dispose();
+            String fileName = "日交易数据" + DateUtils.getDate("yyyyMMddHHmmss") + ".xlsx";
+            new ExportExcel("日交易数据", TerBillDay.class).setDataList(list).write(response, fileName).dispose();
             return null;
         } catch (Exception e) {
             addMessage(redirectAttributes, "导出帐单失败！失败信息：" + e.getMessage());
