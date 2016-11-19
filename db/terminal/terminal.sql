@@ -176,5 +176,7 @@ create index day_idx on ter_bill_month(clear_date);
 
 
 
-
+ter_fail_def
+ic_times <3 and a.ic_amount < 30 " +
+                "and a.total_amount <200 and a.total_times <6
 

@@ -72,6 +72,8 @@
 			</if>
 		</where>
 		${sqlMap.dsf}
+		<!--查找不合极终端-->
+		${sqlMap.fail}
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
 				ORDER BY ${page.orderBy}
@@ -80,7 +82,8 @@
 			</otherwise>
 		</choose>
 	</select>
-	
+
+
 	<select id="findAllList" resultType="TerBillMonth">
 		SELECT 
 			<include refid="terBillMonthColumns"/>

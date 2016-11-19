@@ -198,4 +198,13 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 //		long time = new Date().getTime()-parseDate("2012-11-19").getTime();
 //		System.out.println(time/(24*60*60*1000));
     }
+
+    public static String getFirstDayOnMonth() {
+        String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+        return StringUtils.substring(date, 0, date.length() - 2) + "01";
+    }
+
+    public static Date getFirstDateOnMonth() {
+        return parseDate(getFirstDayOnMonth());
+    }
 }

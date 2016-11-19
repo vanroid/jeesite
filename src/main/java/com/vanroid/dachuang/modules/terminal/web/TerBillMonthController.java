@@ -11,6 +11,7 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
+import com.vanroid.dachuang.modules.terminal.entity.TerTerminal;
 import com.vanroid.dachuang.modules.terminal.service.TerBillMonthService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +118,23 @@ public class TerBillMonthController extends BaseController {
             addMessage(redirectAttributes, "导出帐单失败！失败信息：" + e.getMessage());
         }
         return "redirect:" + Global.getAdminPath() + "/terminal/terBillMonth/?repage";
+    }
+
+    /**
+     * 本月不达标终端
+     *
+     * @param terBillMonth
+     * @param model
+     */
+    @RequiresPermissions("terminal:terBillMonth:view")
+    @RequestMapping(value = "unqualified")
+    public String unqualified(TerBillMonth terBillMonth, HttpServletRequest request, HttpServletResponse response, Model model) {
+        if (terBillMonth.getClearDate() == null) {
+            terBillMonth.setClearDate(DateUtils.getFirstDateOnMonth());
+        }
+        Page<TerBillMonth> page = terBillMonthService.findUnqualifiedPage(new Page<TerBillMonth>(request, response), terBillMonth);
+        model.addAttribute("page", page);
+        return "modules/terminal/unqualifiedList";
     }
 
 

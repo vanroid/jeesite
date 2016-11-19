@@ -5,14 +5,15 @@ package com.vanroid.dachuang.modules.terminal.service;
 
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.collect.Maps;
+import com.thinkgem.jeesite.common.service.BaseService;
 import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.vanroid.dachuang.common.csv.ImportCSV;
+import com.vanroid.dachuang.modules.terminal.entity.TerTerminal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,5 +89,35 @@ public class TerBillMonthService extends CrudService<TerBillMonthDao, TerBillMon
             terBillMonth.preInsert();
         }
         return dao.batchSave(datas);
+    }
+
+    @Transactional
+    public Page<TerBillMonth> findUnqualifiedPage(Page<TerBillMonth> page, TerBillMonth terBillMonth) {
+        // 数据范围
+        terBillMonth.getSqlMap().put("dsf", BaseService.dataScopeFilter(terBillMonth.getCurrentUser(), "o", ""));
+        // 达标定义:月IC卡刷卡笔数(非接笔数)3笔或以上， ；<3
+        // IC卡金额大于等于30; <30
+        // 总刷卡金额大于等于200; <200
+        // 总刷卡6笔或以上; <6
+        String icTimes = DictUtils.getDictValue("ic_times", "ter_fail_def", "3");
+        String icAmount = DictUtils.getDictValue("ic_amount", "ter_fail_def", "30");
+        String totalAmount = DictUtils.getDictValue("total_amount", "ter_fail_def", "200");
+        String totalTimes = DictUtils.getDictValue("total_times", "ter_fail_def", "6");
+
+        StringBuilder failSql = new StringBuilder(" and a.ic_times < ");
+        failSql.append(icTimes);
+        failSql.append(" and a.ic_amount < ");
+        failSql.append(icAmount);
+        failSql.append(" and a.total_amount < ");
+        failSql.append(totalAmount);
+        failSql.append(" and a.total_times < ");
+        failSql.append(totalTimes);
+        //failSql.append(" and a.clear_date = '");
+        //failSql.append(DateUtils.getFirstDayOnMonth());
+        //failSql.append("'");
+
+        terBillMonth.getSqlMap().put("fail", failSql.toString());
+
+        return super.findPage(page, terBillMonth);
     }
 }

@@ -6,6 +6,7 @@ package com.vanroid.dachuang.modules.terminal.dao;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.vanroid.dachuang.modules.terminal.entity.TerBillMonth;
+import com.vanroid.dachuang.modules.terminal.entity.TerTerminal;
 
 import java.util.Date;
 import java.util.List;
@@ -28,4 +29,6 @@ public interface TerBillMonthDao extends CrudDao<TerBillMonth> {
     int deleteByClearDate(Date clrDate);
 
     int batchSave(List<TerBillMonth> datas);
+
+    List<TerTerminal> findFailList(TerTerminal terTerminal);
 }

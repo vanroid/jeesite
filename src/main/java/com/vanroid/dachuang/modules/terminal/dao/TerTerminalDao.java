@@ -30,4 +30,12 @@ public interface TerTerminalDao extends CrudDao<TerTerminal> {
      * @return
      */
     List<TerTerminal> findListByMerchant(TerMerchant terMerchant);
+
+    /**
+     * 查找不达标客户列表
+     *
+     * @param terTerminal
+     * @return
+     */
+    List<TerTerminal> findFailList(TerTerminal terTerminal);
 }
